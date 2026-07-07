@@ -748,6 +748,7 @@ function Library:CreateWindow(options)
                         if callback then callback(selected) end
                     end,
                     Refresh = function(newOpts, newDefault)
+                        if type(newOpts) ~= "table" then return end
                         options = newOpts
                         selected = newDefault or newOpts[1] or "None"
                         ValLabel.Text = selected
@@ -918,9 +919,10 @@ function Library:CreateWindow(options)
                         if callback then callback(GetSelectedArray()) end
                     end,
                     Refresh = function(newOpts, newDefaultArray)
+                        if type(newOpts) ~= "table" then return end
                         options = newOpts
                         selectedDict = {}
-                        if newDefaultArray then
+                        if newDefaultArray and type(newDefaultArray) == "table" then
                             for _, v in ipairs(newDefaultArray) do selectedDict[v] = true end
                         end
                         ValLabel.Text = GetSelectedString()
