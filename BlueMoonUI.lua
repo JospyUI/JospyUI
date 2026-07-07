@@ -745,22 +745,25 @@ function Library:CreateWindow(options)
                     task.delay(0.2, function() TabContent.CanvasSize = UDim2.new(0, 0, 0, TabContent.UIListLayout.AbsoluteContentSize.Y + 40) end)
                 end)
                 
-                return {
-                    Set = function(newVal)
-                        selected = newVal
-                        ValLabel.Text = selected
-                        UpdateOptions(options)
-                        if callback then callback(selected) end
-                    end,
-                    Refresh = function(newOpts, newDefault)
-                        if type(newOpts) ~= "table" then return end
-                        options = newOpts
-                        selected = newDefault or newOpts[1] or "None"
-                        ValLabel.Text = selected
-                        UpdateOptions(newOpts)
-                    end,
-                    GetValue = function() return selected end
-                }
+                local API = {}
+                API.Set = function(arg1, arg2)
+                    local newVal = (arg1 == API) and arg2 or arg1
+                    selected = newVal
+                    ValLabel.Text = selected
+                    UpdateOptions(options)
+                    if callback then callback(selected) end
+                end
+                API.Refresh = function(arg1, arg2, arg3)
+                    local newOpts = (arg1 == API) and arg2 or arg1
+                    local newDefault = (arg1 == API) and arg3 or arg2
+                    if type(newOpts) ~= "table" then return end
+                    options = newOpts
+                    selected = newDefault or newOpts[1] or "None"
+                    ValLabel.Text = selected
+                    UpdateOptions(newOpts)
+                end
+                API.GetValue = function() return selected end
+                return API
             end
 
             function SecObj:CreateMultiDropdown(label, options, defaultSelectedArray, callback)
@@ -918,28 +921,31 @@ function Library:CreateWindow(options)
                     task.delay(0.2, function() TabContent.CanvasSize = UDim2.new(0, 0, 0, TabContent.UIListLayout.AbsoluteContentSize.Y + 40) end)
                 end)
                 
-                return {
-                    Set = function(newArray)
-                        selectedDict = {}
-                        if newArray then
-                            for _, v in ipairs(newArray) do selectedDict[v] = true end
-                        end
-                        ValLabel.Text = GetSelectedString()
-                        UpdateOptions(options)
-                        if callback then callback(GetSelectedArray()) end
-                    end,
-                    Refresh = function(newOpts, newDefaultArray)
-                        if type(newOpts) ~= "table" then return end
-                        options = newOpts
-                        selectedDict = {}
-                        if newDefaultArray and type(newDefaultArray) == "table" then
-                            for _, v in ipairs(newDefaultArray) do selectedDict[v] = true end
-                        end
-                        ValLabel.Text = GetSelectedString()
-                        UpdateOptions(newOpts)
-                    end,
-                    GetValue = function() return GetSelectedArray() end
-                }
+                local API = {}
+                API.Set = function(arg1, arg2)
+                    local newArray = (arg1 == API) and arg2 or arg1
+                    selectedDict = {}
+                    if newArray and type(newArray) == "table" then
+                        for _, v in pairs(newArray) do selectedDict[v] = true end
+                    end
+                    ValLabel.Text = GetSelectedString()
+                    UpdateOptions(options)
+                    if callback then callback(GetSelectedArray()) end
+                end
+                API.Refresh = function(arg1, arg2, arg3)
+                    local newOpts = (arg1 == API) and arg2 or arg1
+                    local newDefaultArray = (arg1 == API) and arg3 or arg2
+                    if type(newOpts) ~= "table" then return end
+                    options = newOpts
+                    selectedDict = {}
+                    if newDefaultArray and type(newDefaultArray) == "table" then
+                        for _, v in pairs(newDefaultArray) do selectedDict[v] = true end
+                    end
+                    ValLabel.Text = GetSelectedString()
+                    UpdateOptions(newOpts)
+                end
+                API.GetValue = function() return GetSelectedArray() end
+                return API
             end
 
             function SecObj:CreateSlider(label, min, max, default, callback)
@@ -1022,15 +1028,16 @@ function Library:CreateWindow(options)
                     end
                 end)
                 
-                return {
-                    Set = function(newVal)
-                        value = math.clamp(newVal, min, max)
-                        ValLabel.Text = tostring(value)
-                        Tween(Fill, {Size = UDim2.new((value - min) / (max - min), 0, 1, 0)}, 0.2)
-                        if callback then callback(value) end
-                    end,
-                    GetValue = function() return value end
-                }
+                local API = {}
+                API.Set = function(arg1, arg2)
+                    local newVal = (arg1 == API) and arg2 or arg1
+                    value = math.clamp(tonumber(newVal) or min, min, max)
+                    ValLabel.Text = tostring(value)
+                    Tween(Fill, {Size = UDim2.new((value - min) / (max - min), 0, 1, 0)}, 0.2)
+                    if callback then callback(value) end
+                end
+                API.GetValue = function() return value end
+                return API
             end
 
             function SecObj:CreateTextBox(label, placeholder, callback)
@@ -1079,13 +1086,14 @@ function Library:CreateWindow(options)
                     if callback then callback(TextBox.Text) end
                 end)
                 
-                return {
-                    Set = function(txt)
-                        TextBox.Text = tostring(txt)
-                        if callback then callback(TextBox.Text) end
-                    end,
-                    GetValue = function() return TextBox.Text end
-                }
+                local API = {}
+                API.Set = function(arg1, arg2)
+                    local txt = (arg1 == API) and arg2 or arg1
+                    TextBox.Text = tostring(txt)
+                    if callback then callback(TextBox.Text) end
+                end
+                API.GetValue = function() return TextBox.Text end
+                return API
             end
 
             function SecObj:CreateKeybind(label, defaultKey, callback)
@@ -1156,13 +1164,14 @@ function Library:CreateWindow(options)
                     end
                 end)
                 
-                return {
-                    Set = function(key)
-                        currentKey = key
-                        BindLabel.Text = key == Enum.KeyCode.Unknown and "None" or key.Name
-                    end,
-                    GetValue = function() return currentKey end
-                }
+                local API = {}
+                API.Set = function(arg1, arg2)
+                    local key = (arg1 == API) and arg2 or arg1
+                    currentKey = key
+                    BindLabel.Text = key == Enum.KeyCode.Unknown and "None" or key.Name
+                end
+                API.GetValue = function() return currentKey end
+                return API
             end
 
             function SecObj:CreateColorPicker(label, defaultColor, callback)
@@ -1359,14 +1368,17 @@ function Library:CreateWindow(options)
                     end
                 end)
                 
-                return {
-                    Set = function(newColor)
+                local API = {}
+                API.Set = function(arg1, arg2)
+                    local newColor = (arg1 == API) and arg2 or arg1
+                    if typeof(newColor) == "Color3" then
                         hue, sat, val = Color3.toHSV(newColor)
                         SetWheelPositionFromColor()
                         UpdateColor()
-                    end,
-                    GetValue = function() return currentColor end
-                }
+                    end
+                end
+                API.GetValue = function() return currentColor end
+                return API
             end
 
             function SecObj:CreateToggle(label, default, callback)
@@ -1422,12 +1434,13 @@ function Library:CreateWindow(options)
                     SetState(not state)
                 end)
                 
-                return {
-                    Set = function(newState)
-                        SetState(newState)
-                    end,
-                    GetValue = function() return state end
-                }
+                local API = {}
+                API.Set = function(arg1, arg2)
+                    local newState = (arg1 == API) and arg2 or arg1
+                    SetState(newState)
+                end
+                API.GetValue = function() return state end
+                return API
             end
 
             function SecObj:CreateButton(label, callback)
