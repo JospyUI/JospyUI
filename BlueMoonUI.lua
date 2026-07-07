@@ -1311,6 +1311,7 @@ end
 
 function Library:CreateKeySystem(options)
     options = options or {}
+    local Theme = self.Themes
     local keyUrl = options.KeyUrl or ""
     local title = options.Title or "Blue Moon Key System"
     local expectedKey = options.Key or ""
