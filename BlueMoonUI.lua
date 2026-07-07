@@ -687,7 +687,11 @@ function Library:CreateWindow(options)
 
                 local function UpdateHeight()
                     if isExpanded then
-                        local targetH = (#options * 25) + 10
+                        local btnCount = 0
+                        for _, child in pairs(DropList:GetChildren()) do
+                            if child:IsA("TextButton") then btnCount = btnCount + 1 end
+                        end
+                        local targetH = (btnCount * 25) + 10
                         Tween(DropList, {Size = UDim2.new(1, 0, 0, targetH)}, 0.2)
                     end
                 end
@@ -696,7 +700,8 @@ function Library:CreateWindow(options)
                     for _, child in pairs(DropList:GetChildren()) do
                         if child:IsA("TextButton") then child:Destroy() end
                     end
-                    for _, opt in ipairs(newOptions) do
+                    for k, v in pairs(newOptions) do
+                        local opt = type(k) == "number" and tostring(v) or tostring(k)
                         local OptBtn = Create("TextButton", {
                             BackgroundTransparency = 1,
                             Size = UDim2.new(1, 0, 0, 25),
@@ -858,7 +863,11 @@ function Library:CreateWindow(options)
 
                 local function UpdateHeight()
                     if isExpanded then
-                        local targetH = (#options * 25) + 10
+                        local btnCount = 0
+                        for _, child in pairs(DropList:GetChildren()) do
+                            if child:IsA("TextButton") then btnCount = btnCount + 1 end
+                        end
+                        local targetH = (btnCount * 25) + 10
                         Tween(DropList, {Size = UDim2.new(1, 0, 0, targetH)}, 0.2)
                     end
                 end
@@ -867,7 +876,8 @@ function Library:CreateWindow(options)
                     for _, child in pairs(DropList:GetChildren()) do
                         if child:IsA("TextButton") then child:Destroy() end
                     end
-                    for _, opt in ipairs(newOptions) do
+                    for k, v in pairs(newOptions) do
+                        local opt = type(k) == "number" and tostring(v) or tostring(k)
                         local isSel = selectedDict[opt] == true
                         local OptBtn = Create("TextButton", {
                             BackgroundTransparency = 1,
