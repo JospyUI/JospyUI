@@ -2,6 +2,7 @@ local TweenService = game:GetService("TweenService")
 local CoreGui = game:GetService("CoreGui")
 local Players = game:GetService("Players")
 local UserInputService = game:GetService("UserInputService")
+local RunService = game:GetService("RunService")
 
 local Library = {
     Themes = {
@@ -45,8 +46,10 @@ local function Create(className, properties, children)
     return instance
 end
 
-local function Tween(instance, properties, duration)
-    local tweenInfo = TweenInfo.new(duration or 0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
+local function Tween(instance, properties, duration, easingStyle, easingDirection)
+    local style = easingStyle or Enum.EasingStyle.Quart
+    local direction = easingDirection or Enum.EasingDirection.Out
+    local tweenInfo = TweenInfo.new(duration or 0.3, style, direction)
     local tween = TweenService:Create(instance, tweenInfo, properties)
     tween:Play()
     return tween
@@ -73,19 +76,22 @@ function Library:CreateWindow(options)
         ResetOnSpawn = false
     })
 
-    -- Main Frame
-    local Main = Create("Frame", {
+    -- Main Frame (CanvasGroup for smooth fades)
+    local Main = Create("CanvasGroup", {
         Name = "Main",
         BackgroundColor3 = Theme.MainBackground,
-        Position = UDim2.new(0.5, -400, 0.5, -275),
+        Position = UDim2.new(0.5, -400, 0.5, -260), -- Start slightly lower
         Size = UDim2.new(0, 800, 0, 550),
-        Active = true,
-        ClipsDescendants = true
+        GroupTransparency = 1, -- Start invisible
+        Active = true
     }, {
         Create("UICorner", { CornerRadius = UDim.new(0, 8) }),
         Create("UIStroke", { Color = Theme.Border, Thickness = 1 })
     })
     Main.Parent = ScreenGui
+
+    -- Smooth Open Animation
+    Tween(Main, {GroupTransparency = 0, Position = UDim2.new(0.5, -400, 0.5, -275)}, 0.6, Enum.EasingStyle.Quint)
 
     -- Header
     local Header = Create("Frame", {
@@ -203,24 +209,25 @@ function Library:CreateWindow(options)
     HideBtn.Parent = Header
     CloseBtn.Parent = Header
 
-    CloseBtn.MouseButton1Click:Connect(function() ScreenGui:Destroy() end)
+    CloseBtn.MouseButton1Click:Connect(function()
+        local closeTween = Tween(Main, {GroupTransparency = 1, Position = UDim2.new(0.5, -400, 0.5, -260)}, 0.4, Enum.EasingStyle.Quint)
+        closeTween.Completed:Wait()
+        ScreenGui:Destroy()
+    end)
 
-    -- Draggable Logic
-    local dragging
+    -- Draggable Logic (Smooth Lerp)
+    local dragging = false
     local dragInput
     local dragStart
     local startPos
-
-    local function update(input)
-        local delta = input.Position - dragStart
-        Main.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
-    end
+    local targetPos = Main.Position
 
     Header.InputBegan:Connect(function(input)
         if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
             dragging = true
             dragStart = input.Position
             startPos = Main.Position
+            targetPos = Main.Position
 
             input.Changed:Connect(function()
                 if input.UserInputState == Enum.UserInputState.End then
@@ -238,7 +245,14 @@ function Library:CreateWindow(options)
 
     UserInputService.InputChanged:Connect(function(input)
         if input == dragInput and dragging then
-            update(input)
+            local delta = input.Position - dragStart
+            targetPos = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+        end
+    end)
+
+    RunService.RenderStepped:Connect(function(dt)
+        if Main and Main.Parent then
+            Main.Position = Main.Position:Lerp(targetPos, math.clamp(dt * 12, 0, 1))
         end
     end)
 
@@ -566,8 +580,8 @@ function Library:CreateWindow(options)
 
                 TogBtn.MouseButton1Click:Connect(function()
                     state = not state
-                    Tween(SwitchTrack, {BackgroundColor3 = state and Theme.Accent or Theme.MainBackground})
-                    Tween(SwitchThumb, {Position = UDim2.new(0, state and 22 or 2, 0.5, -10)})
+                    Tween(SwitchTrack, {BackgroundColor3 = state and Theme.Accent or Theme.MainBackground}, 0.3)
+                    Tween(SwitchThumb, {Position = UDim2.new(0, state and 22 or 2, 0.5, -10)}, 0.4, Enum.EasingStyle.Back)
                     if callback then callback(state) end
                 end)
             end
