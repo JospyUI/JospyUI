@@ -52,10 +52,26 @@ BlueMoonUI:CreateKeySystem({
             print("Color changed!")
         end)
 
+        -- MultiDropdown Example
+        MainSec:CreateMultiDropdown("Target ESP Types", {"Players", "NPCs", "Items", "Vehicles"}, {"Players", "NPCs"}, function(selectedArray)
+            -- selectedArray is a table, e.g. {"Players", "NPCs"}
+            print("Selected ESP Types count: " .. #selectedArray)
+        end)
+
         -- TextBox!
         local MiscSec = VisTab:CreateSection("Misc")
         MiscSec:CreateTextBox("Whitelist Player", "Enter Username...", function(text)
             BlueMoonUI:Notify("Whitelisted", text .. " has been ignored by aimbot.", 4)
+        end)
+
+        -- Example of Programmatic Module Control
+        local TestToggle = MiscSec:CreateToggle("Module A (Target)", true, function(state)
+            print("Module A is now: " .. tostring(state))
+        end)
+
+        MiscSec:CreateButton("Turn OFF Module A", function()
+            TestToggle:Set(false) -- This will visibly update the toggle!
+            BlueMoonUI:Notify("Code Executed", "Module A turned off via code.", 3)
         end)
         
         -- Welcome Notification

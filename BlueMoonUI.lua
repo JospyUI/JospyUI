@@ -727,12 +727,176 @@ function Library:CreateWindow(options)
                 end)
                 
                 return {
+                    Set = function(newVal)
+                        selected = newVal
+                        ValLabel.Text = selected
+                        UpdateOptions(options)
+                        if callback then callback(selected) end
+                    end,
                     Refresh = function(newOpts, newDefault)
+                        options = newOpts
                         selected = newDefault or newOpts[1] or "None"
                         ValLabel.Text = selected
                         UpdateOptions(newOpts)
                     end,
                     GetValue = function() return selected end
+                }
+            end
+
+            function SecObj:CreateMultiDropdown(label, options, defaultSelectedArray, callback)
+                local selectedDict = {}
+                if defaultSelectedArray then
+                    for _, v in ipairs(defaultSelectedArray) do
+                        selectedDict[v] = true
+                    end
+                end
+                
+                local isExpanded = false
+
+                local DropContainer = Create("Frame", {
+                    BackgroundTransparency = 1,
+                    Size = UDim2.new(1, 0, 0, 0),
+                    AutomaticSize = Enum.AutomaticSize.Y
+                })
+                DropContainer.Parent = SecFrame
+
+                local TopBar = Create("Frame", {
+                    BackgroundTransparency = 1,
+                    Size = UDim2.new(1, 0, 0, 30)
+                })
+                TopBar.Parent = DropContainer
+
+                Create("TextLabel", {
+                    BackgroundTransparency = 1,
+                    Size = UDim2.new(0.5, 0, 1, 0),
+                    Font = Enum.Font.Ubuntu,
+                    Text = label,
+                    TextColor3 = Theme.TextSecondary,
+                    TextSize = 13,
+                    TextXAlignment = Enum.TextXAlignment.Left
+                }).Parent = TopBar
+
+                local ValBtn = Create("TextButton", {
+                    BackgroundTransparency = 1,
+                    Position = UDim2.new(0.5, 0, 0, 0),
+                    Size = UDim2.new(0.5, 0, 1, 0),
+                    Text = ""
+                })
+                ValBtn.Parent = TopBar
+                
+                local function GetSelectedString()
+                    local count = 0
+                    local first = nil
+                    for k, v in pairs(selectedDict) do
+                        if v then
+                            count = count + 1
+                            if not first then first = k end
+                        end
+                    end
+                    if count == 0 then return "None" end
+                    if count == 1 then return first end
+                    return count .. " Selected"
+                end
+
+                local ValLabel = Create("TextLabel", {
+                    BackgroundTransparency = 1,
+                    Size = UDim2.new(1, -25, 1, 0),
+                    Font = Enum.Font.Ubuntu,
+                    Text = GetSelectedString(),
+                    TextColor3 = Theme.Accent,
+                    TextSize = 13,
+                    TextXAlignment = Enum.TextXAlignment.Right
+                })
+                ValLabel.Parent = ValBtn
+
+                local Chevron = Create("ImageLabel", {
+                    BackgroundTransparency = 1,
+                    Position = UDim2.new(1, -15, 0.5, -8),
+                    Size = UDim2.new(0, 16, 0, 16),
+                    Image = Library.Icons.ChevronDown,
+                    ImageColor3 = Theme.Accent
+                })
+                Chevron.Parent = ValBtn
+
+                local DropList = Create("Frame", {
+                    BackgroundColor3 = Theme.HeaderButtonBackground,
+                    Size = UDim2.new(1, 0, 0, 0),
+                    AutomaticSize = Enum.AutomaticSize.Y,
+                    Visible = false,
+                    ClipsDescendants = true
+                }, {
+                    Create("UICorner", { CornerRadius = UDim.new(0, 6) }),
+                    Create("UIStroke", { Color = Theme.Border, Thickness = 1 }),
+                    Create("UIListLayout", { SortOrder = Enum.SortOrder.LayoutOrder }),
+                    Create("UIPadding", { PaddingTop = UDim.new(0, 5), PaddingBottom = UDim.new(0, 5) })
+                })
+                DropList.Parent = DropContainer
+                
+                local function GetSelectedArray()
+                    local arr = {}
+                    for k, v in pairs(selectedDict) do
+                        if v then table.insert(arr, k) end
+                    end
+                    return arr
+                end
+
+                local function UpdateOptions(newOptions)
+                    for _, child in pairs(DropList:GetChildren()) do
+                        if child:IsA("TextButton") then child:Destroy() end
+                    end
+                    for _, opt in ipairs(newOptions) do
+                        local isSel = selectedDict[opt] == true
+                        local OptBtn = Create("TextButton", {
+                            BackgroundTransparency = 1,
+                            Size = UDim2.new(1, 0, 0, 25),
+                            Font = Enum.Font.Ubuntu,
+                            Text = opt,
+                            TextColor3 = isSel and Theme.Accent or Theme.TextPrimary,
+                            TextSize = 13
+                        })
+                        OptBtn.Parent = DropList
+                        
+                        OptBtn.MouseEnter:Connect(function() if not selectedDict[opt] then Tween(OptBtn, {TextColor3 = Theme.TextSecondary}, 0.2) end end)
+                        OptBtn.MouseLeave:Connect(function() if not selectedDict[opt] then Tween(OptBtn, {TextColor3 = Theme.TextPrimary}, 0.2) end end)
+                        
+                        OptBtn.MouseButton1Click:Connect(function()
+                            selectedDict[opt] = not selectedDict[opt]
+                            ValLabel.Text = GetSelectedString()
+                            UpdateOptions(newOptions)
+                            if callback then callback(GetSelectedArray()) end
+                        end)
+                    end
+                end
+
+                UpdateOptions(options)
+
+                ValBtn.MouseButton1Click:Connect(function()
+                    isExpanded = not isExpanded
+                    DropList.Visible = isExpanded
+                    Tween(Chevron, {Rotation = isExpanded and 180 or 0}, 0.3)
+                    TabContent.CanvasSize = UDim2.new(0, 0, 0, TabContent.UIListLayout.AbsoluteContentSize.Y + 40)
+                end)
+                
+                return {
+                    Set = function(newArray)
+                        selectedDict = {}
+                        if newArray then
+                            for _, v in ipairs(newArray) do selectedDict[v] = true end
+                        end
+                        ValLabel.Text = GetSelectedString()
+                        UpdateOptions(options)
+                        if callback then callback(GetSelectedArray()) end
+                    end,
+                    Refresh = function(newOpts, newDefaultArray)
+                        options = newOpts
+                        selectedDict = {}
+                        if newDefaultArray then
+                            for _, v in ipairs(newDefaultArray) do selectedDict[v] = true end
+                        end
+                        ValLabel.Text = GetSelectedString()
+                        UpdateOptions(newOpts)
+                    end,
+                    GetValue = function() return GetSelectedArray() end
                 }
             end
 
@@ -817,7 +981,7 @@ function Library:CreateWindow(options)
                 end)
                 
                 return {
-                    SetValue = function(newVal)
+                    Set = function(newVal)
                         value = math.clamp(newVal, min, max)
                         ValLabel.Text = tostring(value)
                         Tween(Fill, {Size = UDim2.new((value - min) / (max - min), 0, 1, 0)}, 0.2)
@@ -874,11 +1038,11 @@ function Library:CreateWindow(options)
                 end)
                 
                 return {
-                    SetText = function(txt)
+                    Set = function(txt)
                         TextBox.Text = tostring(txt)
                         if callback then callback(TextBox.Text) end
                     end,
-                    GetText = function() return TextBox.Text end
+                    GetValue = function() return TextBox.Text end
                 }
             end
 
@@ -951,11 +1115,11 @@ function Library:CreateWindow(options)
                 end)
                 
                 return {
-                    SetKey = function(key)
+                    Set = function(key)
                         currentKey = key
-                        BindLabel.Text = key.Name
+                        BindLabel.Text = key == Enum.KeyCode.Unknown and "None" or key.Name
                     end,
-                    GetKey = function() return currentKey end
+                    GetValue = function() return currentKey end
                 }
             end
 
@@ -1154,12 +1318,12 @@ function Library:CreateWindow(options)
                 end)
                 
                 return {
-                    SetColor = function(newColor)
+                    Set = function(newColor)
                         hue, sat, val = Color3.toHSV(newColor)
                         SetWheelPositionFromColor()
                         UpdateColor()
                     end,
-                    GetColor = function() return currentColor end
+                    GetValue = function() return currentColor end
                 }
             end
 
@@ -1204,13 +1368,24 @@ function Library:CreateWindow(options)
                     Create("UICorner", { CornerRadius = UDim.new(1, 0) })
                 })
                 SwitchThumb.Parent = SwitchTrack
+                
+                local function SetState(newState)
+                    state = newState
+                    Tween(SwitchTrack, {BackgroundColor3 = state and Theme.Accent or Theme.MainBackground}, 0.3)
+                    Tween(SwitchThumb, {Position = UDim2.new(0, state and 22 or 2, 0.5, -10)}, 0.3)
+                    if callback then callback(state) end
+                end
 
                 TogBtn.MouseButton1Click:Connect(function()
-                    state = not state
-                    Tween(SwitchTrack, {BackgroundColor3 = state and Theme.Accent or Theme.MainBackground}, 0.3)
-                    Tween(SwitchThumb, {Position = UDim2.new(0, state and 22 or 2, 0.5, -10)}, 0.4, Enum.EasingStyle.Back)
-                    if callback then callback(state) end
+                    SetState(not state)
                 end)
+                
+                return {
+                    Set = function(newState)
+                        SetState(newState)
+                    end,
+                    GetValue = function() return state end
+                }
             end
 
             function SecObj:CreateButton(label, callback)
