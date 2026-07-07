@@ -25,6 +25,8 @@ AutoDigSection:CreateDropdown("Select Dig Tool", {"None", "Shovel", "Pickaxe"}, 
     print("Selected Dig Tool: " .. selected)
 end)
 
+AutoDigSection:CreateSeparator()
+
 AutoDigSection:CreateToggle("Auto Dig", false, function(state)
     print("Auto Dig state: " .. tostring(state))
 end)

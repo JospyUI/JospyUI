@@ -155,6 +155,20 @@ function Library:CreateWindow(options)
     })
     PingLabel.Parent = Header
 
+    -- Canlı Ping Döngüsü
+    task.spawn(function()
+        while PingLabel.Parent do
+            local success, pingVal = pcall(function()
+                -- GetNetworkPing returns seconds, multiply by 1000 for ms
+                return math.round(Players.LocalPlayer:GetNetworkPing() * 1000)
+            end)
+            if success and pingVal then
+                PingLabel.Text = tostring(pingVal) .. " ms"
+            end
+            task.wait(1)
+        end
+    end)
+
     local function CreateHeaderBtn(icon, xOffset, colorOverride)
         local Btn = Create("TextButton", {
             BackgroundColor3 = Theme.HeaderButtonBackground,
@@ -396,6 +410,21 @@ function Library:CreateWindow(options)
             end)
 
             local SecObj = {}
+
+            function SecObj:CreateSeparator()
+                local SepContainer = Create("Frame", {
+                    BackgroundTransparency = 1,
+                    Size = UDim2.new(1, 0, 0, 10) -- Padding around separator
+                })
+                SepContainer.Parent = SecFrame
+                
+                Create("Frame", {
+                    BackgroundColor3 = Theme.Border,
+                    BorderSizePixel = 0,
+                    Position = UDim2.new(0, 0, 0.5, 0),
+                    Size = UDim2.new(1, 0, 0, 1)
+                }).Parent = SepContainer
+            end
 
             function SecObj:CreateDropdown(label, options, default, callback)
                 local selected = default or options[1] or "None"
