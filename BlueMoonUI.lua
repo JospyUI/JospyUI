@@ -966,7 +966,14 @@ function Library:CreateWindow(options)
 
                 local CPContainer = Create("Frame", {
                     BackgroundTransparency = 1,
-                    Size = UDim2.new(1, 0, 0, 30)
+                    Size = UDim2.new(1, 0, 0, 0),
+                    AutomaticSize = Enum.AutomaticSize.Y
+                }, {
+                    Create("UIListLayout", { 
+                        SortOrder = Enum.SortOrder.LayoutOrder, 
+                        Padding = UDim.new(0, 5),
+                        HorizontalAlignment = Enum.HorizontalAlignment.Right
+                    })
                 })
                 CPContainer.Parent = SecFrame
 
@@ -1014,8 +1021,7 @@ function Library:CreateWindow(options)
                     Create("UICorner", { CornerRadius = UDim.new(0, 6) }),
                     Create("UIStroke", { Color = Theme.Border, Thickness = 1 })
                 })
-                -- Parent to ScreenGui so it floats above everything without getting clipped
-                DropList.Parent = SecFrame:FindFirstAncestor("BlueMoonUI")
+                DropList.Parent = CPContainer
 
                 local Wheel = Create("ImageButton", {
                     BackgroundTransparency = 1,
@@ -1132,10 +1138,6 @@ function Library:CreateWindow(options)
                 ColorDisplayBtn.MouseButton1Click:Connect(function()
                     isExpanded = not isExpanded
                     if isExpanded then
-                        local absPos = ColorDisplayBtn.AbsolutePosition
-                        local absSize = ColorDisplayBtn.AbsoluteSize
-                        -- Position directly under the button, aligned to the right edge (with a large offset to prevent overlapping)
-                        DropList.Position = UDim2.new(0, absPos.X + absSize.X - 150, 0, absPos.Y + absSize.Y + 45)
                         DropList.Visible = true
                         DropList.Size = UDim2.new(0, 150, 0, 0)
                         Tween(DropList, {Size = UDim2.new(0, 150, 0, 90)}, 0.2)
