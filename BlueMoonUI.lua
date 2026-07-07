@@ -14,7 +14,8 @@ local Library = {
         TextDark = Color3.fromRGB(75, 82, 125),
         Ping = Color3.fromRGB(211, 158, 51),
         IconColor = Color3.fromRGB(255, 255, 255),
-        HeaderButtonBackground = Color3.fromRGB(20, 24, 45)
+        HeaderButtonBackground = Color3.fromRGB(20, 24, 45),
+        HighlightLine = Color3.fromRGB(45, 55, 95) -- Added prominent highlight line color
     },
     Icons = {
         Moon = "rbxassetid://7733911828",
@@ -93,9 +94,9 @@ function Library:CreateWindow(options)
     })
     Header.Parent = Main
     
-    -- Header Separator
+    -- Header Separator (Horizontal Highlight)
     Create("Frame", {
-        BackgroundColor3 = Theme.Border,
+        BackgroundColor3 = Theme.HighlightLine,
         BorderSizePixel = 0,
         Position = UDim2.new(0, 0, 1, -1),
         Size = UDim2.new(1, 0, 0, 1),
@@ -211,12 +212,13 @@ function Library:CreateWindow(options)
     })
     Sidebar.Parent = Main
     
-    -- Sidebar Separator
+    -- Sidebar Separator (Vertical Highlight)
     Create("Frame", {
-        BackgroundColor3 = Theme.Border,
+        BackgroundColor3 = Theme.HighlightLine,
         BorderSizePixel = 0,
         Position = UDim2.new(1, -1, 0, 0),
-        Size = UDim2.new(0, 1, 1, 0)
+        Size = UDim2.new(0, 1, 1, 0),
+        ZIndex = 6
     }).Parent = Sidebar
 
     -- Profile Area
