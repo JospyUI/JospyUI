@@ -3,9 +3,8 @@ local BlueMoonUI = loadstring(game:HttpGet("https://raw.githubusercontent.com/Ge
 -- Step 1: Initialize Key System
 BlueMoonUI:CreateKeySystem({
     Title = "Blue Moon Premium",
-    Key = "TESTKEY", -- You can change this or use KeyUrl instead
-    -- KeyUrl = "https://raw.githubusercontent.com/your/repo/key.txt", -- Checks key from website
-    GetKeyUrl = "https://discord.gg/yourserver", -- Copies to clipboard when Get Key is pressed
+    Key = "TESTKEY", 
+    GetKeyUrl = "https://discord.gg/yourserver", 
     
     -- Step 2: Load Main UI after successful login
     OnComplete = function()
@@ -17,27 +16,29 @@ BlueMoonUI:CreateKeySystem({
         -- TAB 1: Combat
         local CombatTab = Window:CreateTab("Combat", BlueMoonUI.Icons.Farm)
         
-        local MainSec = CombatTab:CreateSection("Main Settings")
+        local MainSec = CombatTab:CreateSection("Aimbot Settings")
         
-        MainSec:CreateToggle("Aimbot", false, function(state)
+        local AimbotToggle = MainSec:CreateToggle("Enable Aimbot", false, function(state)
             if state then
-                BlueMoonUI:Notify("Aimbot Enabled", "Warning: Use at your own risk!", 3)
+                BlueMoonUI:Notify("Aimbot", "Aimbot is now active!", 3)
+            else
+                BlueMoonUI:Notify("Aimbot", "Aimbot disabled.", 3)
             end
         end)
         
-        -- Fully working Dropdown!
-        MainSec:CreateDropdown("Target Part", {"Head", "Torso", "HumanoidRootPart"}, "Head", function(selected)
+        -- Dropdown Example
+        local TargetPartDrop = MainSec:CreateDropdown("Target Part", {"Head", "Torso", "HumanoidRootPart"}, "Head", function(selected)
             print("Targeting: " .. selected)
         end)
         
-        -- Slider!
+        -- Slider Example
         MainSec:CreateSlider("Aimbot Smoothness", 1, 100, 50, function(value)
-            print("Smoothness set to " .. value)
+            print("Smoothness: " .. value)
         end)
 
-        -- Keybind!
+        -- Keybind Example
         MainSec:CreateKeybind("Aimbot Key", Enum.KeyCode.E, function()
-            print("Aimbot key pressed!")
+            print("Aimbot hotkey triggered!")
         end)
 
         -- TAB 2: Visuals
@@ -45,33 +46,49 @@ BlueMoonUI:CreateKeySystem({
         
         local EspSec = VisTab:CreateSection("ESP Options")
         
-        EspSec:CreateToggle("Player ESP", true, function() end)
-        
-        -- Color Picker (Wheel Style!)
-        EspSec:CreateColorPicker("ESP Box Color", Color3.fromRGB(255, 80, 80), function(color)
-            print("Color changed!")
+        local EspToggle = EspSec:CreateToggle("Player ESP", true, function(state)
+            print("ESP: " .. tostring(state))
         end)
-
+        
         -- MultiDropdown Example
-        MainSec:CreateMultiDropdown("Target ESP Types", {"Players", "NPCs", "Items", "Vehicles"}, {"Players", "NPCs"}, function(selectedArray)
-            -- selectedArray is a table, e.g. {"Players", "NPCs"}
+        local EspTypesMulti = EspSec:CreateMultiDropdown("ESP Types", {"Players", "NPCs", "Items", "Vehicles"}, {"Players", "NPCs"}, function(selectedArray)
             print("Selected ESP Types count: " .. #selectedArray)
         end)
 
-        -- TextBox!
-        local MiscSec = VisTab:CreateSection("Misc")
-        MiscSec:CreateTextBox("Whitelist Player", "Enter Username...", function(text)
-            BlueMoonUI:Notify("Whitelisted", text .. " has been ignored by aimbot.", 4)
+        -- Color Picker Example
+        local EspColor = EspSec:CreateColorPicker("ESP Box Color", Color3.fromRGB(255, 80, 80), function(color)
+            print("ESP Color changed!")
         end)
 
-        -- Example of Programmatic Module Control
-        local TestToggle = MiscSec:CreateToggle("Module A (Target)", true, function(state)
-            print("Module A is now: " .. tostring(state))
+        -- TAB 3: Controllers (Showcase)
+        local CtrlTab = Window:CreateTab("Controllers", BlueMoonUI.Icons.Settings)
+        
+        local FuncSec = CtrlTab:CreateSection("Programmatic Control")
+
+        FuncSec:CreateButton("Turn ON Aimbot Toggle", function()
+            AimbotToggle:Set(true) 
+            BlueMoonUI:Notify("Code Executed", "Aimbot turned on via code.", 3)
         end)
 
-        MiscSec:CreateButton("Turn OFF Module A", function()
-            TestToggle:Set(false) -- This will visibly update the toggle!
-            BlueMoonUI:Notify("Code Executed", "Module A turned off via code.", 3)
+        FuncSec:CreateButton("Change Target to Torso", function()
+            TargetPartDrop:Set("Torso")
+            BlueMoonUI:Notify("Code Executed", "Dropdown changed to Torso.", 3)
+        end)
+
+        FuncSec:CreateButton("Add 'Bosses' to ESP Types", function()
+            EspTypesMulti:Refresh({"Players", "NPCs", "Items", "Vehicles", "Bosses"}, {"Players", "Bosses"})
+            BlueMoonUI:Notify("Code Executed", "Multi-Dropdown refreshed.", 3)
+        end)
+
+        local MiscSec = CtrlTab:CreateSection("Misc")
+        
+        -- TextBox Example
+        local WhitelistBox = MiscSec:CreateTextBox("Whitelist Player", "Enter Username...", function(text)
+            BlueMoonUI:Notify("Whitelisted", text .. " has been ignored.", 4)
+        end)
+
+        MiscSec:CreateButton("Clear Whitelist Box", function()
+            WhitelistBox:Set("")
         end)
         
         -- Welcome Notification
