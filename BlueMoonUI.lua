@@ -966,10 +966,7 @@ function Library:CreateWindow(options)
 
                 local CPContainer = Create("Frame", {
                     BackgroundTransparency = 1,
-                    Size = UDim2.new(1, 0, 0, 0),
-                    AutomaticSize = Enum.AutomaticSize.Y
-                }, {
-                    Create("UIListLayout", { SortOrder = Enum.SortOrder.LayoutOrder, Padding = UDim.new(0, 5) })
+                    Size = UDim2.new(1, 0, 0, 30)
                 })
                 CPContainer.Parent = SecFrame
 
@@ -1010,14 +1007,15 @@ function Library:CreateWindow(options)
 
                 local DropList = Create("Frame", {
                     BackgroundColor3 = Theme.HeaderButtonBackground,
-                    Size = UDim2.new(1, 0, 0, 90),
+                    Size = UDim2.new(0, 150, 0, 90),
                     Visible = false,
                     ClipsDescendants = true
                 }, {
                     Create("UICorner", { CornerRadius = UDim.new(0, 6) }),
                     Create("UIStroke", { Color = Theme.Border, Thickness = 1 })
                 })
-                DropList.Parent = CPContainer
+                -- Parent to ScreenGui so it floats above everything without getting clipped
+                DropList.Parent = SecFrame:FindFirstAncestor("BlueMoonUI")
 
                 local Wheel = Create("ImageButton", {
                     BackgroundTransparency = 1,
@@ -1133,7 +1131,20 @@ function Library:CreateWindow(options)
 
                 ColorDisplayBtn.MouseButton1Click:Connect(function()
                     isExpanded = not isExpanded
-                    DropList.Visible = isExpanded
+                    if isExpanded then
+                        local absPos = ColorDisplayBtn.AbsolutePosition
+                        local absSize = ColorDisplayBtn.AbsoluteSize
+                        -- Position directly under the button, aligned to the right edge
+                        DropList.Position = UDim2.new(0, absPos.X + absSize.X - 150, 0, absPos.Y + absSize.Y + 5)
+                        DropList.Visible = true
+                        DropList.Size = UDim2.new(0, 150, 0, 0)
+                        Tween(DropList, {Size = UDim2.new(0, 150, 0, 90)}, 0.2)
+                    else
+                        local tween = Tween(DropList, {Size = UDim2.new(0, 150, 0, 0)}, 0.2)
+                        tween.Completed:Connect(function()
+                            if not isExpanded then DropList.Visible = false end
+                        end)
+                    end
                     TabContent.CanvasSize = UDim2.new(0, 0, 0, TabContent.UIListLayout.AbsoluteContentSize.Y + 40)
                     if isExpanded then
                         SetWheelPositionFromColor()
