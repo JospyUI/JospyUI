@@ -11,8 +11,7 @@ BlueMoonUI:CreateKeySystem({
     OnComplete = function()
         local Window = BlueMoonUI:CreateWindow({
             Title = "Blue Moon",
-            Version = "v2.0 PRO",
-            ProfileName = "XxGECEUSTASIxX"
+            Version = "v2.0 PRO"
         })
 
         -- TAB 1: Combat

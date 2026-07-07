@@ -1010,7 +1010,7 @@ function Library:CreateWindow(options)
 
                 local DropList = Create("Frame", {
                     BackgroundColor3 = Theme.HeaderButtonBackground,
-                    Size = UDim2.new(1, 0, 0, 160),
+                    Size = UDim2.new(1, 0, 0, 90),
                     Visible = false,
                     ClipsDescendants = true
                 }, {
@@ -1022,7 +1022,7 @@ function Library:CreateWindow(options)
                 local Wheel = Create("ImageButton", {
                     BackgroundTransparency = 1,
                     Position = UDim2.new(0, 5, 0, 5),
-                    Size = UDim2.new(0, 150, 0, 150),
+                    Size = UDim2.new(0, 80, 0, 80),
                     Image = "rbxassetid://6020299385" -- HSV wheel
                 })
                 Wheel.Parent = DropList
@@ -1037,8 +1037,8 @@ function Library:CreateWindow(options)
 
                 local ValueSlider = Create("TextButton", {
                     BackgroundColor3 = Color3.new(1,1,1),
-                    Position = UDim2.new(0, 165, 0, 5),
-                    Size = UDim2.new(1, -170, 0, 150),
+                    Position = UDim2.new(0, 95, 0, 5),
+                    Size = UDim2.new(1, -100, 0, 80),
                     Text = "",
                     AutoButtonColor = false
                 }, {
