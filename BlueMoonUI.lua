@@ -864,7 +864,8 @@ function Library:CreateWindow(options)
                         OptBtn.MouseButton1Click:Connect(function()
                             selectedDict[opt] = not selectedDict[opt]
                             ValLabel.Text = GetSelectedString()
-                            UpdateOptions(newOptions)
+                            local isSel = selectedDict[opt] == true
+                            Tween(OptBtn, {TextColor3 = isSel and Theme.Accent or Theme.TextPrimary}, 0.2)
                             if callback then callback(GetSelectedArray()) end
                         end)
                     end
