@@ -90,6 +90,31 @@ function Library:CreateWindow(options)
     })
     Main.Parent = ScreenGui
 
+    -- Open Button (Hidden initially)
+    local OpenBtn = Create("TextButton", {
+        Name = "OpenBtn",
+        BackgroundColor3 = Theme.MainBackground,
+        Position = UDim2.new(0.5, -20, 0, -60), -- Hidden above screen
+        Size = UDim2.new(0, 40, 0, 40),
+        Text = "",
+        AutoButtonColor = false,
+        ZIndex = 10
+    }, {
+        Create("UICorner", { CornerRadius = UDim.new(0, 8) }),
+        Create("UIStroke", { Color = Theme.Border, Thickness = 1 })
+    })
+    Create("ImageLabel", {
+        BackgroundTransparency = 1,
+        Position = UDim2.new(0.5, -12, 0.5, -12),
+        Size = UDim2.new(0, 24, 0, 24),
+        Image = Library.Icons.Moon,
+        ImageColor3 = Theme.Accent
+    }).Parent = OpenBtn
+    OpenBtn.Parent = ScreenGui
+
+    OpenBtn.MouseEnter:Connect(function() Tween(OpenBtn, {BackgroundColor3 = Theme.Border}, 0.2) end)
+    OpenBtn.MouseLeave:Connect(function() Tween(OpenBtn, {BackgroundColor3 = Theme.MainBackground}, 0.2) end)
+
     -- Smooth Open Animation
     Tween(Main, {GroupTransparency = 0, Position = UDim2.new(0.5, -400, 0.5, -275)}, 0.6, Enum.EasingStyle.Quint)
 
@@ -230,6 +255,28 @@ function Library:CreateWindow(options)
         local closeTween = Tween(Main, {GroupTransparency = 1, Position = UDim2.new(0.5, -400, 0.5, -260)}, 0.4, Enum.EasingStyle.Quint)
         closeTween.Completed:Wait()
         ScreenGui:Destroy()
+    end)
+
+    -- Hide / Show Logic
+    local isHidden = false
+
+    HideBtn.MouseButton1Click:Connect(function()
+        if not isHidden then
+            isHidden = true
+            local hideTween = Tween(Main, {GroupTransparency = 1, Position = UDim2.new(0.5, -400, 0.5, -250)}, 0.4, Enum.EasingStyle.Quint)
+            Tween(OpenBtn, {Position = UDim2.new(0.5, -20, 0, 20)}, 0.5, Enum.EasingStyle.Back)
+            hideTween.Completed:Wait()
+            if isHidden then Main.Visible = false end
+        end
+    end)
+
+    OpenBtn.MouseButton1Click:Connect(function()
+        if isHidden then
+            isHidden = false
+            Main.Visible = true
+            Tween(OpenBtn, {Position = UDim2.new(0.5, -20, 0, -60)}, 0.4, Enum.EasingStyle.Quint)
+            Tween(Main, {GroupTransparency = 0, Position = UDim2.new(0.5, -400, 0.5, -275)}, 0.5, Enum.EasingStyle.Quint)
+        end
     end)
 
     -- Draggable Logic (Smooth Lerp)
