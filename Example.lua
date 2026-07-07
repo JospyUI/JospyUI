@@ -5,17 +5,18 @@ local BlueMoonUI = loadstring(game:HttpGet("https://raw.githubusercontent.com/Ge
 local Window = BlueMoonUI:CreateWindow({
     Title = "Blue Moon",
     Version = "v1.1.2 Alpha",
-    ProfileName = "XxGECEUSTASIxX"
+    ProfileName = "XxGECEUSTASIxX",
+    Ping = "106 ms"
 })
 
--- Create Tabs
-local InfoTab = Window:CreateTab("Info")
-local FarmTab = Window:CreateTab("Farm")
-local FishingTab = Window:CreateTab("Fishing")
-local MicrowaveTab = Window:CreateTab("Microwave")
-local PlayerTab = Window:CreateTab("Player")
-local TeleportsTab = Window:CreateTab("Teleports")
-local OtherTab = Window:CreateTab("Other")
+-- Create Tabs with specific icon IDs
+local InfoTab = Window:CreateTab("Info", "") -- No icon needed for info if it was just a header, but it's a tab here.
+local FarmTab = Window:CreateTab("Farm", BlueMoonUI.Icons.Farm)
+local FishingTab = Window:CreateTab("Fishing", BlueMoonUI.Icons.Fishing)
+local MicrowaveTab = Window:CreateTab("Microwave", BlueMoonUI.Icons.Microwave)
+local PlayerTab = Window:CreateTab("Player", BlueMoonUI.Icons.Player)
+local TeleportsTab = Window:CreateTab("Teleports", BlueMoonUI.Icons.Teleports)
+local OtherTab = Window:CreateTab("Other", BlueMoonUI.Icons.Other)
 
 -- Populate the 'Farm' Tab (as seen in the provided image)
 local AutoDigSection = FarmTab:CreateSection("Auto Dig")
@@ -42,11 +43,5 @@ SellingSection:CreateButton("Manual Sell All Trash", function()
     print("Manual Sell All Trash clicked!")
 end)
 
--- The info label at the bottom of the section
-SellingSection:CreateLabel([[Info
-Always keep Disable AFK Animation ON for Auto Sell when you are afking.
-
-These functions use teleportation to the point of sale.
-Be careful and use at your own risk.]], true)
-
-print("Blue Moon UI Loaded Successfully!")
+-- The exact info box at the bottom of the section
+SellingSection:CreateInfo("Info", "Always keep Disable AFK Animation ON for Auto Sell when you are afking.\n\nThese functions use teleportation to the point of sale.\nBe careful and use at your own risk.")
