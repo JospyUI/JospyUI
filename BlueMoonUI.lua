@@ -1,6 +1,7 @@
 local TweenService = game:GetService("TweenService")
 local CoreGui = game:GetService("CoreGui")
 local Players = game:GetService("Players")
+local UserInputService = game:GetService("UserInputService")
 
 local Library = {
     Themes = {
@@ -202,6 +203,39 @@ function Library:CreateWindow(options)
 
     CloseBtn.MouseButton1Click:Connect(function() ScreenGui:Destroy() end)
 
+    -- Draggable Logic
+    local dragging = false
+    local dragInput, dragStart, startPos
+
+    Header.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+            dragging = true
+            dragStart = input.Position
+            startPos = Main.Position
+
+            input.Changed:Connect(function()
+                if input.UserInputState == Enum.UserInputState.End then
+                    dragging = false
+                end
+            end)
+        end
+    end)
+
+    Header.InputChanged:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
+            dragInput = input
+        end
+    end)
+
+    UserInputService.InputChanged:Connect(function(input)
+        if input == dragInput and dragging then
+            if Main and Main.Parent then
+                local delta = input.Position - dragStart
+                Main.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+            end
+        end
+    end)
+
     -- Sidebar
     local Sidebar = Create("Frame", {
         Name = "Sidebar",
@@ -238,13 +272,19 @@ function Library:CreateWindow(options)
     })
     AvatarCircle.Parent = ProfileArea
 
-    -- Placeholder avatar image inside circle
-    Create("ImageLabel", {
+    -- Get real avatar
+    local userId = Players.LocalPlayer and Players.LocalPlayer.UserId or 1
+    local avatarImage = "rbxasset://textures/ui/GuiImagePlaceholder.png"
+    pcall(function()
+        avatarImage = Players:GetUserThumbnailAsync(userId, Enum.ThumbnailType.HeadShot, Enum.ThumbnailSize.Size420x420)
+    end)
+
+    local AvatarIcon = Create("ImageLabel", {
         BackgroundTransparency = 1,
         Size = UDim2.new(1, 0, 1, 0),
-        Image = "rbxasset://textures/ui/GuiImagePlaceholder.png", -- Replace with real avatar later
-        ImageColor3 = Theme.TextSecondary
-    }, { Create("UICorner", { CornerRadius = UDim.new(1, 0) }) }).Parent = AvatarCircle
+        Image = avatarImage
+    }, { Create("UICorner", { CornerRadius = UDim.new(1, 0) }) })
+    AvatarIcon.Parent = AvatarCircle
 
     local OnlineDot = Create("Frame", {
         BackgroundColor3 = Theme.Accent,
