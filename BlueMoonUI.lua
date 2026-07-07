@@ -79,6 +79,7 @@ function Library:CreateWindow(options)
         BackgroundColor3 = Theme.MainBackground,
         Position = UDim2.new(0.5, -400, 0.5, -275),
         Size = UDim2.new(0, 800, 0, 550),
+        Active = true,
         ClipsDescendants = true
     }, {
         Create("UICorner", { CornerRadius = UDim.new(0, 8) }),
@@ -91,6 +92,7 @@ function Library:CreateWindow(options)
         Name = "Header",
         BackgroundColor3 = Theme.MainBackground,
         Size = UDim2.new(1, 0, 0, 50),
+        Active = true,
         ZIndex = 5
     })
     Header.Parent = Main
@@ -204,8 +206,15 @@ function Library:CreateWindow(options)
     CloseBtn.MouseButton1Click:Connect(function() ScreenGui:Destroy() end)
 
     -- Draggable Logic
-    local dragging = false
-    local dragInput, dragStart, startPos
+    local dragging
+    local dragInput
+    local dragStart
+    local startPos
+
+    local function update(input)
+        local delta = input.Position - dragStart
+        Main.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+    end
 
     Header.InputBegan:Connect(function(input)
         if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
@@ -229,10 +238,7 @@ function Library:CreateWindow(options)
 
     UserInputService.InputChanged:Connect(function(input)
         if input == dragInput and dragging then
-            if Main and Main.Parent then
-                local delta = input.Position - dragStart
-                Main.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
-            end
+            update(input)
         end
     end)
 
