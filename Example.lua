@@ -3,7 +3,7 @@
 -- Demonstrates EVERY SINGLE MODULE and API FEATURE available in the library!
 -- ==============================================================================
 
-local K_UI = loadstring(game:HttpGet("https://raw.githubusercontent.com/GeceUstasi/BlueMoonUI/7e9db95f310d27a0dfb4b7e8b3c323aaff445135/K-UI.lua"))()
+local K_UI = loadstring(game:HttpGet("https://raw.githubusercontent.com/GeceUstasi/BlueMoonUI/b25b788f14b0fe90eaa5644be40061c182d99ee8/K-UI.lua"))()
 
 -- 1. Create the Main Window (Acrylic Effect/Blur is enabled!)
 local Window = K_UI:CreateWindow("K-UI Full API Showcase", {
