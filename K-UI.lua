@@ -699,12 +699,12 @@ function Library:CreateWindow(options)
                     })
                     local TipFrame = Create("Frame", {
                         BackgroundColor3 = Theme.HeaderButtonBackground,
-                        AnchorPoint = Vector2.new(1, 1),
-                        Position = UDim2.new(1, 0, 0, -5), -- Right-aligned, slightly above the icon
+                        AnchorPoint = Vector2.new(1, 0.5),
+                        Position = UDim2.new(0, -5, 0.5, 0), -- 5 pixels to the left of the ? icon
                         Size = UDim2.new(0, 0, 0, 26),
                         AutomaticSize = Enum.AutomaticSize.X,
                         Visible = false,
-                        Parent = InfoIcon, -- Parent to the icon so position is relative to it
+                        Parent = InfoIcon,
                         ZIndex = 1000
                     }, {
                         Create("UICorner", { CornerRadius = UDim.new(0, 6) }),
@@ -713,7 +713,8 @@ function Library:CreateWindow(options)
                     })
                     Create("TextLabel", {
                         BackgroundTransparency = 1,
-                        Size = UDim2.new(1, 0, 1, 0),
+                        Size = UDim2.new(0, 0, 1, 0), -- Width is 0 so AutomaticSize controls it
+                        AutomaticSize = Enum.AutomaticSize.X,
                         Font = Enum.Font.Ubuntu,
                         Text = text,
                         TextColor3 = Theme.TextPrimary,
