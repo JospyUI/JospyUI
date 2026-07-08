@@ -1359,7 +1359,7 @@ function Library:CreateWindow(options)
                     Text = "",
                     TextColor3 = Theme.TextPrimary,
                     TextSize = 13,
-                    TextXAlignment = Enum.TextXAlignment.Right,
+                    TextXAlignment = Enum.TextXAlignment.Center,
                     ClearTextOnFocus = false
                 })
                 TextBox.Parent = BoxBg
@@ -1788,7 +1788,7 @@ function Library:CreateWindow(options)
 
                 local SwitchTrack = Create("Frame", {
                     BackgroundColor3 = state and Theme.Accent or Theme.MainBackground,
-                    Position = UDim2.new(1, -55, 0.5, -12),
+                    Position = UDim2.new(1, -75, 0.5, -12),
                     Size = UDim2.new(0, 44, 0, 24)
                 }, {
                     Create("UICorner", { CornerRadius = UDim.new(1, 0) })
