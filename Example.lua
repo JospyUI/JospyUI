@@ -5,8 +5,11 @@ local K_UI = loadstring(game:HttpGet("https://raw.githubusercontent.com/GeceUsta
 
 -- 1. Create the Main Window
 local Window = K_UI:CreateWindow("K-UI Showcase", {
-    Accent = Color3.fromRGB(255, 90, 90) -- Red accent color
+    Accent = Color3.fromRGB(58, 108, 243),
+    Acrylic = true -- Enables background blur when UI is open
 })
+
+print("Injected via:", K_UI.GetExecutor())
 
 -- 2. Create Tabs
 local CombatTab = Window:CreateTab("Combat")
@@ -24,15 +27,17 @@ AimbotSection:CreateLabel("Welcome to K-UI! This is a label. It's great for show
 AimbotSection:CreateToggle({
     Name = "Enable Aimbot",
     Default = false,
-    Tooltip = "Turns the aimbot on or off.",
-    Flag = "AimbotEnabled",
+    Tooltip = "Turn the Aimbot on or off.",
+    Flag = "AimbotToggle",
     Callback = function(state)
-        print("Aimbot enabled:", state)
+        print("Aimbot is now:", state)
     end
 })
 
+AimbotSection:CreateDivider()
+
 -- Slider
-AimbotSection:CreateSlider({
+local fovSlider = AimbotSection:CreateSlider({
     Name = "Aimbot FOV",
     Min = 0,
     Max = 360,
@@ -58,8 +63,9 @@ AimbotSection:CreateDropdown({
 })
 
 -- Button
-AimbotSection:CreateButton("Reset Aimbot Target", function()
-    print("Aimbot target reset!")
+AimbotSection:CreateButton("Reset FOV to 90", function()
+    fovSlider.Set(90)
+    print("FOV Reset!")
 end)
 
 
@@ -68,8 +74,27 @@ end)
 -- ==========================================
 local ESPSection = VisualsTab:CreateSection("ESP Options")
 
+ESPSection:CreateDivider("Visual Filters")
+
+local dynDrop = ESPSection:CreateDropdown({
+    Name = "Target Priority",
+    Options = {"Distance", "Health", "Threat"},
+    Default = "Distance",
+    Tooltip = "Choose who the Aimbot targets first.",
+    Flag = "TargetPriority",
+    Callback = function(selected)
+        print("Priority set to:", selected)
+    end
+})
+
+ESPSection:CreateButton("Update Priority Options", function()
+    dynDrop.SetOptions({"Closest", "Lowest HP", "Highest Level"})
+    dynDrop.SetTitle("Target Priority (Updated)")
+    print("Dropdown options updated via API!")
+end)
+
 -- Multi-Dropdown
-ESPSection:CreateMultiDropdown({
+local multiDrop = ESPSection:CreateMultiDropdown({
     Name = "ESP Filters",
     Options = {"Players", "NPCs", "Items", "Vehicles", "Chests"},
     Default = {"Players", "NPCs"},
@@ -101,7 +126,7 @@ ESPSection:CreateColorPicker({
 local MiscSection = CombatTab:CreateSection("Miscellaneous")
 
 -- Keybind
-MiscSection:CreateKeybind({
+local triggerBind = MiscSection:CreateKeybind({
     Name = "Triggerbot Key (Hold Mode)",
     Default = Enum.KeyCode.E,
     Tooltip = "Hold this key to automatically shoot when aiming at an enemy.",
@@ -125,10 +150,22 @@ MiscSection:CreateTextBox({
     end
 })
 
-MiscSection:CreateClipboard({
-    Name = "Copy Discord Link",
-    Text = "https://discord.gg/BlueMoon",
-    Tooltip = "Copies our Discord server invite link to your clipboard."
+MiscSection:CreateClipboard("Copy Discord Invite", "https://discord.gg/invite")
+
+MiscSection:CreateDivider("API Demonstration")
+
+local apiToggle = MiscSection:CreateToggle({
+    Name = "Disable Settings",
+    Default = false,
+    Callback = function(state)
+        -- Demonstrating the SetDisabled API on other elements
+        triggerBind.SetDisabled(state)
+        if state then
+            triggerBind.SetTitle("Triggerbot (DISABLED)")
+        else
+            triggerBind.SetTitle("Triggerbot Key (Hold Mode)")
+        end
+    end
 })
 
 local ConfigSection = VisualsTab:CreateSection("Configuration System")
