@@ -1972,9 +1972,9 @@ function Library:CreateWindow(options)
         UI_Visible = not UI_Visible
         if UI_Visible then
             Main.Visible = true
-            Tween(Main, {GroupTransparency = 0, Size = UDim2.new(0, 800, 0, 550), Position = UDim2.new(0.5, -400, 0.5, -275)}, 0.4, Enum.EasingStyle.Quart, Enum.EasingDirection.Out)
+            Tween(Main, {GroupTransparency = 0, Size = UDim2.new(0, 800, 0, 550)}, 0.4, Enum.EasingStyle.Quart, Enum.EasingDirection.Out)
         else
-            local tween = Tween(Main, {GroupTransparency = 1, Size = UDim2.new(0, 750, 0, 500), Position = UDim2.new(0.5, -375, 0.5, -250)}, 0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.Out)
+            local tween = Tween(Main, {GroupTransparency = 1, Size = UDim2.new(0, 750, 0, 500)}, 0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.Out)
             tween.Completed:Connect(function()
                 if not UI_Visible then Main.Visible = false end
             end)
@@ -1982,8 +1982,8 @@ function Library:CreateWindow(options)
     end
 
     UserInputService.InputBegan:Connect(function(input, gameProcessed)
-        if gameProcessed then return end
         if input.KeyCode == Library.ToggleKey then
+            if UserInputService:GetFocusedTextBox() then return end
             WindowObj:ToggleUI()
         end
     end)
