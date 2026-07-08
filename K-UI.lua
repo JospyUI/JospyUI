@@ -726,10 +726,25 @@ function Library:CreateWindow(options)
                 TabContent.CanvasSize = UDim2.new(0, 0, 0, TabContent.UIListLayout.AbsoluteContentSize.Y + 40)
             end)
 
-
                 local function AddTooltip(parent, text)
                     if not text then return end
+                    
+                    -- Check if an InfoIcon already exists and update its text
+                    for _, child in ipairs(parent:GetChildren()) do
+                        if child.Name == "InfoIcon" then
+                            local tipFrame = child:FindFirstChild("TipFrame")
+                            if tipFrame then
+                                local tipLabel = tipFrame:FindFirstChild("TipLabel")
+                                if tipLabel then
+                                    tipLabel.Text = text
+                                    return
+                                end
+                            end
+                        end
+                    end
+                    
                     local InfoIcon = Create("Frame", {
+                        Name = "InfoIcon",
                         BackgroundColor3 = Theme.HeaderButtonBackground,
                         Position = UDim2.new(1, -18, 0.5, -9),
                         Size = UDim2.new(0, 18, 0, 18),
@@ -750,6 +765,7 @@ function Library:CreateWindow(options)
                         ZIndex = InfoIcon.ZIndex + 1
                     })
                     local TipFrame = Create("Frame", {
+                        Name = "TipFrame",
                         BackgroundColor3 = Theme.HeaderButtonBackground,
                         AnchorPoint = Vector2.new(1, 0.5),
                         Position = UDim2.new(0, -5, 0.5, 0), -- 5 pixels to the left of the ? icon
@@ -764,6 +780,7 @@ function Library:CreateWindow(options)
                         Create("UIPadding", { PaddingLeft = UDim.new(0, 10), PaddingRight = UDim.new(0, 10) })
                     })
                     Create("TextLabel", {
+                        Name = "TipLabel",
                         BackgroundTransparency = 1,
                         Size = UDim2.new(0, 0, 1, 0), -- Width is 0 so AutomaticSize controls it
                         AutomaticSize = Enum.AutomaticSize.X,
@@ -1011,7 +1028,7 @@ function Library:CreateWindow(options)
                     DropLbl.TextTransparency = state and 0.5 or 0
                 end
                 API.SetTitle = function(title) DropLbl.Text = title end
-                API.SetDescription = function(desc) AddTooltip(DropContainer, desc) end
+                API.SetDescription = function(desc) AddTooltip(TopBar, desc) end
                 API.OnChanged = function(func) callback = func end
                 API.SetOptions = function(newOpts) API.Refresh(newOpts) end
                 if flag then Library.Flags[flag] = API end
@@ -1265,7 +1282,7 @@ function Library:CreateWindow(options)
                     DropLbl.TextTransparency = state and 0.5 or 0
                 end
                 API.SetTitle = function(title) DropLbl.Text = title end
-                API.SetDescription = function(desc) AddTooltip(DropContainer, desc) end
+                API.SetDescription = function(desc) AddTooltip(TopBar, desc) end
                 API.OnChanged = function(func) callback = func end
                 API.SetOptions = function(newOpts) API.Refresh(newOpts) end
                 if flag then Library.Flags[flag] = API end
@@ -1850,7 +1867,7 @@ function Library:CreateWindow(options)
                     ColorLbl.TextTransparency = state and 0.5 or 0
                 end
                 API.SetTitle = function(title) ColorLbl.Text = title end
-                API.SetDescription = function(desc) AddTooltip(CPContainer, desc) end
+                API.SetDescription = function(desc) AddTooltip(TopBar, desc) end
                 API.OnChanged = function(func) callback = func end
                 if flag then Library.Flags[flag] = API end
                 return API
