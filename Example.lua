@@ -11,7 +11,6 @@ local Window = K_UI:CreateWindow("K-UI Showcase", {
 -- 2. Create Tabs
 local CombatTab = Window:CreateTab("Combat")
 local VisualsTab = Window:CreateTab("Visuals")
-local SettingsTab = Window:CreateTab("Settings")
 
 -- ==========================================
 -- COMBAT TAB
@@ -123,7 +122,13 @@ MiscSection:CreateTextBox({
     end
 })
 
-local ConfigSection = SettingsTab:CreateSection("Configuration System")
+MiscSection:CreateClipboard({
+    Name = "Copy Discord Link",
+    Text = "https://discord.gg/BlueMoon",
+    Tooltip = "Copies our Discord server invite link to your clipboard."
+})
+
+local ConfigSection = VisualsTab:CreateSection("Configuration System")
 
 ConfigSection:CreateButton("Save Config", function()
     -- Saves all elements that have a 'Flag' assigned to them.

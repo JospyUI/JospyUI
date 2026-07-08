@@ -56,6 +56,22 @@ local function Tween(instance, properties, duration, easingStyle, easingDirectio
 end
 
 Library.Flags = {}
+Library.ToggleKey = Enum.KeyCode.RightControl
+
+function Library.CopyToClipboard(text)
+    local success, _ = pcall(function()
+        if setclipboard then
+            setclipboard(tostring(text))
+        end
+    end)
+    if Library.Notify then
+        if success and setclipboard then
+            Library:Notify("Clipboard", "Copied to clipboard successfully!", 3)
+        else
+            Library:Notify("Clipboard Error", "Your executor does not support clipboard copying.", 4)
+        end
+    end
+end
 
 local HttpService = game:GetService("HttpService")
 
@@ -621,7 +637,9 @@ function Library:CreateWindow(options)
             TabContent.CanvasSize = UDim2.new(0, 0, 0, TabContent.UIListLayout.AbsoluteContentSize.Y + 40)
         end)
 
-        TabBtn.MouseButton1Click:Connect(function()
+        local TabObj = {}
+        
+        function TabObj:Select()
             if WindowObj.CurrentTab == name then return end
             
             for _, child in pairs(TabsContainer:GetChildren()) do
@@ -638,16 +656,11 @@ function Library:CreateWindow(options)
             end
             TabContent.Visible = true
             WindowObj.CurrentTab = name
-        end)
-
-        if not WindowObj.CurrentTab then
-            WindowObj.CurrentTab = name
-            TabContent.Visible = true
-            TabBtn.BackgroundColor3 = Theme.Accent
-            TabIcon.ImageColor3 = Theme.TextPrimary
         end
-
-        local TabObj = {}
+        
+        TabBtn.MouseButton1Click:Connect(function()
+            TabObj:Select()
+        end)
 
         function TabObj:CreateSection(title)
             local SecFrame = Create("Frame", {
@@ -1840,6 +1853,51 @@ function Library:CreateWindow(options)
                 Btn.MouseButton1Click:Connect(function() if callback then callback() end end)
             end
 
+            function SecObj:CreateClipboard(configOrLabel, copyText)
+                local config = type(configOrLabel) == "table" and configOrLabel or {Name = configOrLabel, Text = copyText}
+                local label = config.Name or "Copy"
+                local textToCopy = config.Text or ""
+                local tooltip = config.Tooltip
+                local callback = config.Callback
+
+                local Btn = Create("TextButton", {
+                    BackgroundColor3 = Theme.ButtonBackground,
+                    Size = UDim2.new(1, 0, 0, 38),
+                    Font = Enum.Font.Ubuntu,
+                    Text = label,
+                    TextColor3 = Theme.TextPrimary,
+                    TextSize = 13,
+                    AutoButtonColor = false
+                }, {
+                    Create("UICorner", { CornerRadius = UDim.new(0, 6) })
+                })
+                Btn.Parent = SecFrame
+                AddTooltip(Btn, tooltip)
+
+                -- Icon to indicate it's a copy action
+                Create("ImageLabel", {
+                    BackgroundTransparency = 1,
+                    Position = UDim2.new(1, -25, 0.5, -7),
+                    Size = UDim2.new(0, 14, 0, 14),
+                    Image = "rbxassetid://10709796033", -- Copy icon
+                    ImageColor3 = Theme.TextSecondary
+                }).Parent = Btn
+
+                Btn.MouseEnter:Connect(function() Tween(Btn, {BackgroundColor3 = Color3.fromRGB(Theme.ButtonBackground.R * 255 + 10, Theme.ButtonBackground.G * 255 + 10, Theme.ButtonBackground.B * 255 + 10)}, 0.1) end)
+                Btn.MouseLeave:Connect(function() Tween(Btn, {BackgroundColor3 = Theme.ButtonBackground}, 0.1) end)
+                Btn.MouseButton1Click:Connect(function() 
+                    Library.CopyToClipboard(textToCopy)
+                    if callback then callback(textToCopy) end
+                end)
+                
+                local API = {}
+                API.Set = function(arg1, arg2)
+                    local newTxt = (arg1 == API) and arg2 or arg1
+                    textToCopy = tostring(newTxt)
+                end
+                return API
+            end
+
             function SecObj:CreateLabel(text)
                 local Lbl = Create("TextLabel", {
                     BackgroundTransparency = 1,
@@ -1904,6 +1962,66 @@ function Library:CreateWindow(options)
         end
 
         return TabObj
+    end
+    local UI_Visible = true
+    function WindowObj:ToggleUI()
+        UI_Visible = not UI_Visible
+        if UI_Visible then
+            Main.Visible = true
+            Tween(Main, {GroupTransparency = 0, Size = UDim2.new(0, 800, 0, 550), Position = UDim2.new(0.5, -400, 0.5, -275)}, 0.4, Enum.EasingStyle.Quart, Enum.EasingDirection.Out)
+        else
+            local tween = Tween(Main, {GroupTransparency = 1, Size = UDim2.new(0, 750, 0, 500), Position = UDim2.new(0.5, -375, 0.5, -250)}, 0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.Out)
+            tween.Completed:Connect(function()
+                if not UI_Visible then Main.Visible = false end
+            end)
+        end
+    end
+
+    UserInputService.InputBegan:Connect(function(input, gameProcessed)
+        if gameProcessed then return end
+        if input.KeyCode == Library.ToggleKey then
+            WindowObj:ToggleUI()
+        end
+    end)
+    
+    HideBtn.MouseButton1Click:Connect(function()
+        WindowObj:ToggleUI()
+    end)
+    
+    CloseBtn.MouseButton1Click:Connect(function()
+        ScreenGui:Destroy()
+    end)
+
+    local SettingsTab = WindowObj:CreateTab("Settings", Library.Icons.Settings)
+    
+    SettingsBtn.MouseButton1Click:Connect(function()
+        SettingsTab:Select()
+    end)
+
+    local MainSettings = SettingsTab:CreateSection("Menu Settings")
+    MainSettings:CreateKeybind({
+        Name = "Toggle UI Key",
+        Default = Library.ToggleKey,
+        Tooltip = "The key used to hide and show this menu.",
+        Callback = function(key)
+            Library.ToggleKey = key
+        end
+    })
+
+    local InfoSettings = SettingsTab:CreateSection("Information")
+    InfoSettings:CreateInfo("Framework", "Powered by K-UI Library\nDeveloped by ijosephk")
+
+    -- Ensure first tab created by user takes priority if they create one right after
+    -- Because SettingsTab was just created, it became the current tab. We should let the next CreateTab override it.
+    local originalCreateTab = WindowObj.CreateTab
+    local firstUserTabCreated = false
+    function WindowObj:CreateTab(name, icon)
+        local tab = originalCreateTab(self, name, icon)
+        if not firstUserTabCreated then
+            tab:Select()
+            firstUserTabCreated = true
+        end
+        return tab
     end
 
     return WindowObj
