@@ -1,0 +1,24 @@
+{
+  "name": "fearless-salk",
+  "version": "1.0.0",
+  "description": "<div align=\"center\">   <h1>🌑 Jospy UI Library</h1>   <p>A premium, modern, and highly customizable UI library for Roblox exploit scripts.</p> </div>",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ijosephyusufk-dev/JospyUI.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/ijosephyusufk-dev/JospyUI/issues"
+  },
+  "homepage": "https://github.com/ijosephyusufk-dev/JospyUI#readme",
+  "devDependencies": {
+    "vitepress": "^1.6.4"
+  }
+}
