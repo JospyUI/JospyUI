@@ -1029,7 +1029,13 @@ function Library:CreateWindow(options)
                 end
                 API.SetTitle = function(title) DropLbl.Text = title end
                 API.SetDescription = function(desc) AddTooltip(TopBar, desc) end
-                API.OnChanged = function(func) callback = func end
+                API.OnChanged = function(func) 
+                    local oldCallback = callback 
+                    callback = function(...) 
+                        if oldCallback then oldCallback(...) end 
+                        if func then func(...) end 
+                    end 
+                end
                 API.SetOptions = function(newOpts) API.Refresh(newOpts) end
                 if flag then Library.Flags[flag] = API end
                 return API
@@ -1283,7 +1289,13 @@ function Library:CreateWindow(options)
                 end
                 API.SetTitle = function(title) DropLbl.Text = title end
                 API.SetDescription = function(desc) AddTooltip(TopBar, desc) end
-                API.OnChanged = function(func) callback = func end
+                API.OnChanged = function(func) 
+                    local oldCallback = callback 
+                    callback = function(...) 
+                        if oldCallback then oldCallback(...) end 
+                        if func then func(...) end 
+                    end 
+                end
                 API.SetOptions = function(newOpts) API.Refresh(newOpts) end
                 if flag then Library.Flags[flag] = API end
                 return API
@@ -1396,7 +1408,13 @@ function Library:CreateWindow(options)
                 end
                 API.SetTitle = function(title) TitleLabel.Text = title end
                 API.SetDescription = function(desc) AddTooltip(SliderContainer, desc) end
-                API.OnChanged = function(func) callback = func end
+                API.OnChanged = function(func) 
+                    local oldCallback = callback 
+                    callback = function(...) 
+                        if oldCallback then oldCallback(...) end 
+                        if func then func(...) end 
+                    end 
+                end
                 if flag then Library.Flags[flag] = API end
                 return API
             end
@@ -1471,7 +1489,13 @@ function Library:CreateWindow(options)
                 end
                 API.SetTitle = function(title) BoxTitleLbl.Text = title end
                 API.SetDescription = function(desc) AddTooltip(TxtContainer, desc) end
-                API.OnChanged = function(func) callback = func end
+                API.OnChanged = function(func) 
+                    local oldCallback = callback 
+                    callback = function(...) 
+                        if oldCallback then oldCallback(...) end 
+                        if func then func(...) end 
+                    end 
+                end
                 if flag then Library.Flags[flag] = API end
                 return API
             end
@@ -1590,7 +1614,13 @@ function Library:CreateWindow(options)
                 end
                 API.SetTitle = function(title) KeyTitleLbl.Text = title end
                 API.SetDescription = function(desc) AddTooltip(BindContainer, desc) end
-                API.OnChanged = function(func) onBind = func end
+                API.OnChanged = function(func) 
+                    local oldOnBind = onBind 
+                    onBind = function(...) 
+                        if oldOnBind then oldOnBind(...) end 
+                        if func then func(...) end 
+                    end 
+                end
                 if flag then Library.Flags[flag] = API end
                 return API
             end
@@ -1868,7 +1898,13 @@ function Library:CreateWindow(options)
                 end
                 API.SetTitle = function(title) ColorLbl.Text = title end
                 API.SetDescription = function(desc) AddTooltip(TopBar, desc) end
-                API.OnChanged = function(func) callback = func end
+                API.OnChanged = function(func) 
+                    local oldCallback = callback 
+                    callback = function(...) 
+                        if oldCallback then oldCallback(...) end 
+                        if func then func(...) end 
+                    end 
+                end
                 if flag then Library.Flags[flag] = API end
                 return API
             end
@@ -1950,7 +1986,13 @@ function Library:CreateWindow(options)
                 end
                 API.SetTitle = function(title) TogLbl.Text = title end
                 API.SetDescription = function(desc) AddTooltip(TogBtn, desc) end
-                API.OnChanged = function(func) callback = func end
+                API.OnChanged = function(func) 
+                    local oldCallback = callback 
+                    callback = function(...) 
+                        if oldCallback then oldCallback(...) end 
+                        if func then func(...) end 
+                    end 
+                end
                 if flag then Library.Flags[flag] = API end
                 return API
             end
