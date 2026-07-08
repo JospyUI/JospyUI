@@ -1,97 +1,112 @@
-local BlueMoonUI = loadstring(game:HttpGet("https://raw.githubusercontent.com/GeceUstasi/BlueMoonUI/master/BlueMoonUI.lua"))()
+-- Example.lua: K-UI Showcase Script
 
--- Step 1: Initialize Key System
-BlueMoonUI:CreateKeySystem({
-    Title = "Blue Moon Premium",
-    Key = "TESTKEY", 
-    GetKeyUrl = "https://discord.gg/yourserver", 
-    
-    -- Step 2: Load Main UI after successful login
-    OnComplete = function()
-        local Window = BlueMoonUI:CreateWindow({
-            Title = "Blue Moon",
-            Version = "v2.0 PRO"
-        })
+local K_UI = loadstring(game:HttpGet("https://raw.githubusercontent.com/GeceUstasi/BlueMoonUI/master/K-UI.lua"))()
 
-        -- TAB 1: Combat
-        local CombatTab = Window:CreateTab("Combat", BlueMoonUI.Icons.Farm)
-        
-        local MainSec = CombatTab:CreateSection("Aimbot Settings")
-        
-        local AimbotToggle = MainSec:CreateToggle("Enable Aimbot", false, function(state)
-            if state then
-                BlueMoonUI:Notify("Aimbot", "Aimbot is now active!", 3)
-            else
-                BlueMoonUI:Notify("Aimbot", "Aimbot disabled.", 3)
-            end
-        end)
-        
-        -- Dropdown Example
-        local TargetPartDrop = MainSec:CreateDropdown("Target Part", {"Head", "Torso", "HumanoidRootPart"}, "Head", function(selected)
-            print("Targeting: " .. selected)
-        end)
-        
-        -- Slider Example
-        MainSec:CreateSlider("Aimbot Smoothness", 1, 100, 50, function(value)
-            print("Smoothness: " .. value)
-        end)
+local Window = K_UI:CreateWindow("K-UI Showcase", {
+    Accent = Color3.fromRGB(255, 90, 90) -- Example of overriding the accent color
+})
 
-        -- Keybind Example
-        MainSec:CreateKeybind("Aimbot Key", Enum.KeyCode.E, function()
-            print("Aimbot hotkey triggered!")
-        end)
+local MainTab = Window:CreateTab("Main Features", "rbxassetid://6026568240")
+local ConfigTab = Window:CreateTab("Settings", "rbxassetid://6031280882")
 
-        -- TAB 2: Visuals
-        local VisTab = Window:CreateTab("Visuals", BlueMoonUI.Icons.Eye)
-        
-        local EspSec = VisTab:CreateSection("ESP Options")
-        
-        local EspToggle = EspSec:CreateToggle("Player ESP", true, function(state)
-            print("ESP: " .. tostring(state))
-        end)
-        
-        -- MultiDropdown Example
-        local EspTypesMulti = EspSec:CreateMultiDropdown("ESP Types", {"Players", "NPCs", "Items", "Vehicles"}, {"Players", "NPCs"}, function(selectedArray)
-            print("Selected ESP Types count: " .. #selectedArray)
-        end)
+local MainSec = MainTab:CreateSection("Premium Elements")
 
-        -- Color Picker Example
-        local EspColor = EspSec:CreateColorPicker("ESP Box Color", Color3.fromRGB(255, 80, 80), function(color)
-            print("ESP Color changed!")
-        end)
+MainSec:CreateLabel("Welcome to K-UI! This label is great for paragraphs and instructions.")
 
-        -- TAB 3: Controllers (Showcase)
-        local CtrlTab = Window:CreateTab("Controllers", BlueMoonUI.Icons.Settings)
-        
-        local FuncSec = CtrlTab:CreateSection("Programmatic Control")
-
-        FuncSec:CreateButton("Turn ON Aimbot Toggle", function()
-            AimbotToggle:Set(true) 
-            BlueMoonUI:Notify("Code Executed", "Aimbot turned on via code.", 3)
-        end)
-
-        FuncSec:CreateButton("Change Target to Torso", function()
-            TargetPartDrop:Set("Torso")
-            BlueMoonUI:Notify("Code Executed", "Dropdown changed to Torso.", 3)
-        end)
-
-        FuncSec:CreateButton("Add 'Bosses' to ESP Types", function()
-            EspTypesMulti:Refresh({"Players", "NPCs", "Items", "Vehicles", "Bosses"}, {"Players", "Bosses"})
-            BlueMoonUI:Notify("Code Executed", "Multi-Dropdown refreshed.", 3)
-        end)
-
-        local MiscSec = CtrlTab:CreateSection("Misc")
-        
-        -- TextBox Example
-        local WhitelistBox = MiscSec:CreateTextBox("Whitelist Player", "Enter Username...", function(text)
-            BlueMoonUI:Notify("Whitelisted", text .. " has been ignored.", 4)
-        end)
-
-        MiscSec:CreateButton("Clear Whitelist Box", function()
-            WhitelistBox:Set("")
-        end)
-        
-        -- Welcome Notification
-        BlueMoonUI:Notify("Authentication Success", "Welcome back to Blue Moon PRO!", 5)
+MainSec:CreateToggle({
+    Name = "Aimbot",
+    Default = false,
+    Tooltip = "Automatically aims at the nearest enemy.",
+    Flag = "AimbotToggle",
+    Callback = function(state)
+        print("Aimbot:", state)
     end
 })
+
+MainSec:CreateSlider({
+    Name = "Aimbot FOV",
+    Min = 0,
+    Max = 360,
+    Default = 90,
+    Tooltip = "Field of view for the aimbot.",
+    Flag = "AimbotFOV",
+    Callback = function(val)
+        print("FOV:", val)
+    end
+})
+
+MainSec:CreateDropdown({
+    Name = "Target Part (Searchable)",
+    Options = {"Head", "Torso", "HumanoidRootPart", "Left Arm", "Right Arm", "Left Leg", "Right Leg"},
+    Default = "Head",
+    Searchable = true,
+    Tooltip = "Select which part to aim at.",
+    Flag = "TargetPartDrop",
+    Callback = function(selected)
+        print("Target Part:", selected)
+    end
+})
+
+MainSec:CreateMultiDropdown({
+    Name = "ESP Filters",
+    Options = {"Players", "NPCs", "Items", "Vehicles", "Bosses", "Allies", "Enemies"},
+    Default = {"Players", "Bosses"},
+    Searchable = true,
+    Tooltip = "Select multiple entities to draw ESP on.",
+    Flag = "ESPTypes",
+    Callback = function(selectedArray)
+        print("ESP Types:")
+        for _, v in ipairs(selectedArray) do print("-", v) end
+    end
+})
+
+MainSec:CreateColorPicker({
+    Name = "ESP Box Color (Alpha)",
+    Default = Color3.fromRGB(255, 0, 0),
+    Tooltip = "Change the color and transparency of the ESP box.",
+    Flag = "ESPColor",
+    Callback = function(color, transparency)
+        print("Color changed:", color, "Transparency:", transparency)
+    end
+})
+
+MainSec:CreateKeybind({
+    Name = "Triggerbot Key (Hold Mode)",
+    Default = Enum.KeyCode.E,
+    Mode = "Hold", -- Can be Toggle, Hold, or Always
+    Tooltip = "Hold this key to automatically shoot enemies.",
+    Flag = "TriggerKey",
+    Callback = function(isActive)
+        print("Triggerbot Active:", isActive)
+    end
+})
+
+MainSec:CreateTextBox({
+    Name = "Player to Target",
+    Placeholder = "Enter username...",
+    Tooltip = "Target a specific player.",
+    Flag = "TargetName",
+    Callback = function(txt)
+        print("Targeting:", txt)
+    end
+})
+
+local ConfigSec = ConfigTab:CreateSection("Config System")
+
+ConfigSec:CreateButton("Save Settings", function()
+    local success = Window:SaveConfig("K_UI_Configs", "MySettings")
+    if success then
+        print("Settings saved successfully!")
+    else
+        print("Your executor does not support writefile.")
+    end
+end)
+
+ConfigSec:CreateButton("Load Settings", function()
+    local success = Window:LoadConfig("K_UI_Configs", "MySettings")
+    if success then
+        print("Settings loaded successfully!")
+    else
+        print("Failed to load settings.")
+    end
+end)

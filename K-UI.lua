@@ -64,18 +64,54 @@ function Library:CreateWindow(options)
     local Theme = self.Themes
     
     -- Cleanup
-    for _, gui in pairs(CoreGui:GetChildren()) do
-        if gui.Name == "BlueMoonUI" then gui:Destroy() end
+    if CoreGui:FindFirstChild("K-UI") then
+        CoreGui:FindFirstChild("K-UI"):Destroy()
     end
 
     local ScreenGui = Create("ScreenGui", {
-        Name = "BlueMoonUI",
+        Name = "K-UI",
         Parent = CoreGui,
         ZIndexBehavior = Enum.ZIndexBehavior.Sibling,
         IgnoreGuiInset = true,
         ResetOnSpawn = false
     })
 
+    -- Intro Animation
+    local IntroFrame = Create("Frame", {
+        BackgroundColor3 = Theme.MainBackground,
+        Size = UDim2.new(1, 0, 1, 0),
+        Position = UDim2.new(0, 0, 0, 0),
+        ZIndex = 9999,
+        Parent = ScreenGui
+    })
+    
+    local IntroText = Create("TextLabel", {
+        BackgroundTransparency = 1,
+        Size = UDim2.new(1, 0, 1, -30),
+        Font = Enum.Font.Ubuntu,
+        Text = "K-UI",
+        TextColor3 = Theme.Accent,
+        TextSize = 60,
+        TextTransparency = 1,
+        ZIndex = 10000,
+        Parent = IntroFrame
+    })
+
+    local IntroCredit = Create("TextLabel", {
+        BackgroundTransparency = 1,
+        Size = UDim2.new(1, 0, 1, 40),
+        Font = Enum.Font.Ubuntu,
+        Text = "by ijosephk",
+        TextColor3 = Theme.TextSecondary,
+        TextSize = 20,
+        TextTransparency = 1,
+        ZIndex = 10000,
+        Parent = IntroFrame
+    })
+    
+    Tween(IntroText, {TextTransparency = 0}, 1)
+    Tween(IntroCredit, {TextTransparency = 0}, 1)
+    
     -- Main Frame (CanvasGroup for smooth fades)
     local Main = Create("CanvasGroup", {
         Name = "Main",
@@ -89,6 +125,21 @@ function Library:CreateWindow(options)
         Create("UIStroke", { Color = Theme.Border, Thickness = 1 })
     })
     Main.Parent = ScreenGui
+
+    -- Finish intro animation asynchronously
+    task.spawn(function()
+        task.wait(1.5)
+        local t1 = Tween(IntroText, {TextTransparency = 1, Position = UDim2.new(0, 0, -0.1, 0)}, 0.5)
+        local t2 = Tween(IntroCredit, {TextTransparency = 1, Position = UDim2.new(0, 0, 0.1, 40)}, 0.5)
+        local t3 = Tween(IntroFrame, {BackgroundTransparency = 1}, 0.5)
+        t3.Completed:Wait()
+        IntroFrame:Destroy()
+        
+        -- Pop in animation for Main
+        Main.Size = UDim2.new(0, 600, 0, 400)
+        Main.Position = UDim2.new(0.5, -300, 0.5, -200)
+        Tween(Main, {GroupTransparency = 0, Size = UDim2.new(0, 800, 0, 550), Position = UDim2.new(0.5, -400, 0.5, -260)}, 0.4)
+    end)
 
     -- Open Button (Hidden initially)
     local OpenBtn = Create("TextButton", {
@@ -598,6 +649,45 @@ function Library:CreateWindow(options)
                 TabContent.CanvasSize = UDim2.new(0, 0, 0, TabContent.UIListLayout.AbsoluteContentSize.Y + 40)
             end)
 
+
+                local function AddTooltip(parent, text)
+                    if not text then return end
+                    local InfoIcon = Create("ImageLabel", {
+                        BackgroundTransparency = 1,
+                        Position = UDim2.new(1, -25, 0.5, -10),
+                        Size = UDim2.new(0, 20, 0, 20),
+                        Image = "rbxassetid://6031094678",
+                        ImageColor3 = Theme.TextSecondary,
+                        Parent = parent,
+                        ZIndex = parent.ZIndex + 1
+                    })
+                    local TipFrame = Create("Frame", {
+                        BackgroundColor3 = Theme.HeaderButtonBackground,
+                        Position = UDim2.new(1, 5, 0.5, -15),
+                        Size = UDim2.new(0, 0, 0, 30),
+                        AutomaticSize = Enum.AutomaticSize.X,
+                        Visible = false,
+                        Parent = parent,
+                        ZIndex = 1000
+                    }, {
+                        Create("UICorner", { CornerRadius = UDim.new(0, 6) }),
+                        Create("UIStroke", { Color = Theme.Border, Thickness = 1 }),
+                        Create("UIPadding", { PaddingLeft = UDim.new(0, 10), PaddingRight = UDim.new(0, 10) })
+                    })
+                    Create("TextLabel", {
+                        BackgroundTransparency = 1,
+                        Size = UDim2.new(1, 0, 1, 0),
+                        Font = Enum.Font.Ubuntu,
+                        Text = text,
+                        TextColor3 = Theme.TextPrimary,
+                        TextSize = 13,
+                        Parent = TipFrame,
+                        ZIndex = 1001
+                    })
+                    InfoIcon.MouseEnter:Connect(function() TipFrame.Visible = true end)
+                    InfoIcon.MouseLeave:Connect(function() TipFrame.Visible = false end)
+                end
+
             local SecObj = {}
 
             function SecObj:CreateSeparator()
@@ -615,7 +705,16 @@ function Library:CreateWindow(options)
                 }).Parent = SepContainer
             end
 
-            function SecObj:CreateDropdown(label, options, default, callback)
+            function SecObj:CreateDropdown(configOrLabel, optionsList, defaultVal, callbackFunc)
+                local config = type(configOrLabel) == "table" and configOrLabel or {Name = configOrLabel, Options = optionsList, Default = defaultVal, Callback = callbackFunc}
+                local label = config.Name or "Dropdown"
+                local options = config.Options or {}
+                local default = config.Default
+                local callback = config.Callback
+                local tooltip = config.Tooltip
+                local flag = config.Flag
+                local searchable = config.Searchable or false
+
                 local selected = default or options[1] or "None"
                 local isExpanded = false
 
@@ -627,6 +726,7 @@ function Library:CreateWindow(options)
                     Create("UIListLayout", { SortOrder = Enum.SortOrder.LayoutOrder, Padding = UDim.new(0, 5) })
                 })
                 DropContainer.Parent = SecFrame
+                AddTooltip(TopBar, tooltip)
 
                 local TopBar = Create("Frame", {
                     BackgroundTransparency = 1,
@@ -672,6 +772,48 @@ function Library:CreateWindow(options)
                 })
                 Chevron.Parent = ValBtn
 
+
+                local SearchBox
+                if searchable then
+                    SearchBox = Create("TextBox", {
+                        BackgroundColor3 = Theme.MainBackground,
+                        Size = UDim2.new(1, 0, 0, 30),
+                        Visible = false,
+                        Font = Enum.Font.Ubuntu,
+                        PlaceholderText = "Search...",
+                        Text = "",
+                        TextColor3 = Theme.TextPrimary,
+                        TextSize = 13,
+                        ClearTextOnFocus = false
+                    }, {
+                        Create("UICorner", { CornerRadius = UDim.new(0, 4) }),
+                        Create("UIStroke", { Color = Theme.Border, Thickness = 1 }),
+                        Create("UIPadding", { PaddingLeft = UDim.new(0, 5) })
+                    })
+                    SearchBox.Parent = DropContainer
+                end
+                
+
+                local SearchBox
+                if searchable then
+                    SearchBox = Create("TextBox", {
+                        BackgroundColor3 = Theme.MainBackground,
+                        Size = UDim2.new(1, 0, 0, 30),
+                        Visible = false,
+                        Font = Enum.Font.Ubuntu,
+                        PlaceholderText = "Search...",
+                        Text = "",
+                        TextColor3 = Theme.TextPrimary,
+                        TextSize = 13,
+                        ClearTextOnFocus = false
+                    }, {
+                        Create("UICorner", { CornerRadius = UDim.new(0, 4) }),
+                        Create("UIStroke", { Color = Theme.Border, Thickness = 1 }),
+                        Create("UIPadding", { PaddingLeft = UDim.new(0, 5) })
+                    })
+                    SearchBox.Parent = DropContainer
+                end
+                
                 local DropList = Create("Frame", {
                     BackgroundColor3 = Theme.HeaderButtonBackground,
                     Size = UDim2.new(1, 0, 0, 0),
@@ -689,7 +831,7 @@ function Library:CreateWindow(options)
                     if isExpanded then
                         local btnCount = 0
                         for _, child in pairs(DropList:GetChildren()) do
-                            if child:IsA("TextButton") then btnCount = btnCount + 1 end
+                            if child:IsA("TextButton") and child.Visible then btnCount = btnCount + 1 end
                         end
                         local targetH = (btnCount * 25) + 10
                         Tween(DropList, {Size = UDim2.new(1, 0, 0, targetH)}, 0.2)
@@ -735,9 +877,14 @@ function Library:CreateWindow(options)
                 ValBtn.MouseButton1Click:Connect(function()
                     isExpanded = not isExpanded
                     if isExpanded then
+                        if searchable then SearchBox.Visible = true end
                         DropList.Visible = true
                         UpdateHeight()
                     else
+                        if searchable then
+                            SearchBox.Visible = false
+                            SearchBox.Text = ""
+                        end
                         local tween = Tween(DropList, {Size = UDim2.new(1, 0, 0, 0)}, 0.2)
                         tween.Completed:Connect(function() if not isExpanded then DropList.Visible = false end end)
                     end
@@ -770,13 +917,23 @@ function Library:CreateWindow(options)
                     UpdateOptions(newOpts)
                 end
                 API.GetValue = function() return selected end
+                if flag then Library.Flags[flag] = API end
                 return API
             end
 
-            function SecObj:CreateMultiDropdown(label, options, defaultSelectedArray, callback)
+            function SecObj:CreateMultiDropdown(configOrLabel, optionsList, defaultSelectedArray, callbackFunc)
+                local config = type(configOrLabel) == "table" and configOrLabel or {Name = configOrLabel, Options = optionsList, Default = defaultSelectedArray, Callback = callbackFunc}
+                local label = config.Name or "MultiDropdown"
+                local options = config.Options or {}
+                local defaultArray = config.Default or {}
+                local callback = config.Callback
+                local tooltip = config.Tooltip
+                local flag = config.Flag
+                local searchable = config.Searchable or false
+
                 local selectedDict = {}
-                if defaultSelectedArray then
-                    for _, v in ipairs(defaultSelectedArray) do
+                if defaultArray then
+                    for _, v in ipairs(defaultArray) do
                         selectedDict[v] = true
                     end
                 end
@@ -791,6 +948,7 @@ function Library:CreateWindow(options)
                     Create("UIListLayout", { SortOrder = Enum.SortOrder.LayoutOrder, Padding = UDim.new(0, 5) })
                 })
                 DropContainer.Parent = SecFrame
+                AddTooltip(TopBar, tooltip)
 
                 local TopBar = Create("Frame", {
                     BackgroundTransparency = 1,
@@ -850,6 +1008,27 @@ function Library:CreateWindow(options)
                 })
                 Chevron.Parent = ValBtn
 
+
+                local SearchBox
+                if searchable then
+                    SearchBox = Create("TextBox", {
+                        BackgroundColor3 = Theme.MainBackground,
+                        Size = UDim2.new(1, 0, 0, 30),
+                        Visible = false,
+                        Font = Enum.Font.Ubuntu,
+                        PlaceholderText = "Search...",
+                        Text = "",
+                        TextColor3 = Theme.TextPrimary,
+                        TextSize = 13,
+                        ClearTextOnFocus = false
+                    }, {
+                        Create("UICorner", { CornerRadius = UDim.new(0, 4) }),
+                        Create("UIStroke", { Color = Theme.Border, Thickness = 1 }),
+                        Create("UIPadding", { PaddingLeft = UDim.new(0, 5) })
+                    })
+                    SearchBox.Parent = DropContainer
+                end
+                
                 local DropList = Create("Frame", {
                     BackgroundColor3 = Theme.HeaderButtonBackground,
                     Size = UDim2.new(1, 0, 0, 0),
@@ -875,7 +1054,7 @@ function Library:CreateWindow(options)
                     if isExpanded then
                         local btnCount = 0
                         for _, child in pairs(DropList:GetChildren()) do
-                            if child:IsA("TextButton") then btnCount = btnCount + 1 end
+                            if child:IsA("TextButton") and child.Visible then btnCount = btnCount + 1 end
                         end
                         local targetH = (btnCount * 25) + 10
                         Tween(DropList, {Size = UDim2.new(1, 0, 0, targetH)}, 0.2)
@@ -912,15 +1091,37 @@ function Library:CreateWindow(options)
                     end
                     UpdateHeight()
                 end
+                
+                if searchable then
+                    SearchBox:GetPropertyChangedSignal("Text"):Connect(function()
+                        local filter = string.lower(SearchBox.Text)
+                        for _, child in pairs(DropList:GetChildren()) do
+                            if child:IsA("TextButton") then
+                                if filter == "" then
+                                    child.Visible = true
+                                else
+                                    child.Visible = string.find(string.lower(child.Text), filter, 1, true) ~= nil
+                                end
+                            end
+                        end
+                        UpdateHeight()
+                    end)
+                end
+
 
                 UpdateOptions(options)
 
                 ValBtn.MouseButton1Click:Connect(function()
                     isExpanded = not isExpanded
                     if isExpanded then
+                        if searchable then SearchBox.Visible = true end
                         DropList.Visible = true
                         UpdateHeight()
                     else
+                        if searchable then
+                            SearchBox.Visible = false
+                            SearchBox.Text = ""
+                        end
                         local tween = Tween(DropList, {Size = UDim2.new(1, 0, 0, 0)}, 0.2)
                         tween.Completed:Connect(function() if not isExpanded then DropList.Visible = false end end)
                     end
@@ -959,16 +1160,27 @@ function Library:CreateWindow(options)
                     UpdateOptions(newOpts)
                 end
                 API.GetValue = function() return GetSelectedArray() end
+                if flag then Library.Flags[flag] = API end
                 return API
             end
 
-            function SecObj:CreateSlider(label, min, max, default, callback)
+            function SecObj:CreateSlider(configOrLabel, minVal, maxVal, defaultVal, callbackFunc)
+                local config = type(configOrLabel) == "table" and configOrLabel or {Name = configOrLabel, Min = minVal, Max = maxVal, Default = defaultVal, Callback = callbackFunc}
+                local label = config.Name or "Slider"
+                local min = config.Min or 0
+                local max = config.Max or 100
+                local default = config.Default or min
+                local callback = config.Callback
+                local tooltip = config.Tooltip
+                local flag = config.Flag
+
                 local value = math.clamp(default or min, min, max)
                 local SliderContainer = Create("Frame", {
                     BackgroundTransparency = 1,
                     Size = UDim2.new(1, 0, 0, 45)
                 })
                 SliderContainer.Parent = SecFrame
+                AddTooltip(SliderContainer, tooltip)
 
                 local TitleLabel = Create("TextLabel", {
                     BackgroundTransparency = 1,
@@ -1051,15 +1263,24 @@ function Library:CreateWindow(options)
                     if callback then callback(value) end
                 end
                 API.GetValue = function() return value end
+                if flag then Library.Flags[flag] = API end
                 return API
             end
 
-            function SecObj:CreateTextBox(label, placeholder, callback)
+            function SecObj:CreateTextBox(configOrLabel, placeholderText, callbackFunc)
+                local config = type(configOrLabel) == "table" and configOrLabel or {Name = configOrLabel, Placeholder = placeholderText, Callback = callbackFunc}
+                local label = config.Name or "TextBox"
+                local placeholder = config.Placeholder or "Type here..."
+                local callback = config.Callback
+                local tooltip = config.Tooltip
+                local flag = config.Flag
+
                 local TxtContainer = Create("Frame", {
                     BackgroundTransparency = 1,
                     Size = UDim2.new(1, 0, 0, 30)
                 })
                 TxtContainer.Parent = SecFrame
+                AddTooltip(TxtContainer, tooltip)
 
                 Create("TextLabel", {
                     BackgroundTransparency = 1,
@@ -1107,10 +1328,19 @@ function Library:CreateWindow(options)
                     if callback then callback(TextBox.Text) end
                 end
                 API.GetValue = function() return TextBox.Text end
+                if flag then Library.Flags[flag] = API end
                 return API
             end
 
-            function SecObj:CreateKeybind(label, defaultKey, callback)
+            function SecObj:CreateKeybind(configOrLabel, defaultKeyVal, callbackFunc)
+                local config = type(configOrLabel) == "table" and configOrLabel or {Name = configOrLabel, Default = defaultKeyVal, Callback = callbackFunc}
+                local label = config.Name or "Keybind"
+                local defaultKey = config.Default or Enum.KeyCode.Unknown
+                local callback = config.Callback
+                local tooltip = config.Tooltip
+                local flag = config.Flag
+                local mode = config.Mode or "Toggle" -- Toggle, Hold, Always
+
                 local currentKey = defaultKey or Enum.KeyCode.Unknown
                 local binding = false
 
@@ -1119,6 +1349,7 @@ function Library:CreateWindow(options)
                     Size = UDim2.new(1, 0, 0, 30)
                 })
                 BindContainer.Parent = SecFrame
+                AddTooltip(BindContainer, tooltip)
 
                 Create("TextLabel", {
                     BackgroundTransparency = 1,
@@ -1157,10 +1388,21 @@ function Library:CreateWindow(options)
                     BindLabel.Text = "..."
                 end)
 
+                local keyState = false
                 UserInputService.InputBegan:Connect(function(input, gameProcessed)
                     if not binding then
                         if input.UserInputType == Enum.UserInputType.Keyboard and input.KeyCode == currentKey and not gameProcessed then
-                            if callback then callback() end
+                            if mode == "Toggle" then
+                                keyState = not keyState
+                                if callback then callback(keyState) end
+                            elseif mode == "Hold" then
+                                keyState = true
+                                if callback then callback(true) end
+                            elseif mode == "Always" then
+                                if callback then callback(true) end
+                            else
+                                if callback then callback() end
+                            end
                         end
                         return
                     end
@@ -1178,6 +1420,14 @@ function Library:CreateWindow(options)
                     end
                 end)
                 
+                UserInputService.InputEnded:Connect(function(input, gameProcessed)
+                    if not binding and mode == "Hold" and input.UserInputType == Enum.UserInputType.Keyboard and input.KeyCode == currentKey and not gameProcessed then
+                        keyState = false
+                        if callback then callback(false) end
+                    end
+                end)
+
+                
                 local API = {}
                 API.Set = function(arg1, arg2)
                     local key = (arg1 == API) and arg2 or arg1
@@ -1185,10 +1435,18 @@ function Library:CreateWindow(options)
                     BindLabel.Text = key == Enum.KeyCode.Unknown and "None" or key.Name
                 end
                 API.GetValue = function() return currentKey end
+                if flag then Library.Flags[flag] = API end
                 return API
             end
 
-            function SecObj:CreateColorPicker(label, defaultColor, callback)
+            function SecObj:CreateColorPicker(configOrLabel, defaultColorVal, callbackFunc)
+                local config = type(configOrLabel) == "table" and configOrLabel or {Name = configOrLabel, Default = defaultColorVal, Callback = callbackFunc}
+                local label = config.Name or "Color Picker"
+                local defaultColor = config.Default or Color3.new(1, 1, 1)
+                local callback = config.Callback
+                local tooltip = config.Tooltip
+                local flag = config.Flag
+
                 local currentColor = defaultColor or Color3.new(1, 1, 1)
                 local hue, sat, val = Color3.toHSV(currentColor)
                 local isExpanded = false
@@ -1204,6 +1462,7 @@ function Library:CreateWindow(options)
                     })
                 })
                 CPContainer.Parent = SecFrame
+                AddTooltip(TopBar, tooltip)
 
                 local TopBar = Create("Frame", {
                     BackgroundTransparency = 1,
@@ -1267,10 +1526,11 @@ function Library:CreateWindow(options)
                 }, { Create("UICorner", { CornerRadius = UDim.new(1, 0) }), Create("UIStroke", { Thickness = 1 }) })
                 WheelRing.Parent = Wheel
 
+                local alpha = 1
                 local ValueSlider = Create("TextButton", {
                     BackgroundColor3 = Color3.new(1,1,1),
                     Position = UDim2.new(0, 95, 0, 5),
-                    Size = UDim2.new(1, -100, 0, 80),
+                    Size = UDim2.new(0.5, -55, 0, 80),
                     Text = "",
                     AutoButtonColor = false
                 }, {
@@ -1293,15 +1553,51 @@ function Library:CreateWindow(options)
                     AnchorPoint = Vector2.new(0, 0.5)
                 }, { Create("UIStroke", { Thickness = 1 }) })
                 ValueLine.Parent = ValueSlider
+                
+                local AlphaSlider = Create("TextButton", {
+                    BackgroundColor3 = Color3.new(1,1,1),
+                    Position = UDim2.new(0.5, 45, 0, 5),
+                    Size = UDim2.new(0.5, -55, 0, 80),
+                    Text = "",
+                    AutoButtonColor = false
+                }, {
+                    Create("UICorner", { CornerRadius = UDim.new(0, 4) }),
+                    Create("UIStroke", { Color = Theme.Border, Thickness = 1 }),
+                    Create("UIGradient", {
+                        Color = ColorSequence.new({
+                            ColorSequenceKeypoint.new(0, Color3.new(1,1,1)),
+                            ColorSequenceKeypoint.new(1, Color3.new(1,1,1))
+                        }),
+                        Transparency = NumberSequence.new({
+                            NumberSequenceKeypoint.new(0, 0),
+                            NumberSequenceKeypoint.new(1, 1)
+                        }),
+                        Rotation = 90
+                    })
+                })
+                AlphaSlider.Parent = DropList
+
+                local AlphaLine = Create("Frame", {
+                    BackgroundColor3 = Color3.new(1,1,1),
+                    Size = UDim2.new(1, 4, 0, 2),
+                    Position = UDim2.new(0, -2, 0, 0),
+                    AnchorPoint = Vector2.new(0, 0.5)
+                }, { Create("UIStroke", { Thickness = 1 }) })
+                AlphaLine.Parent = AlphaSlider
 
                 local function UpdateColor()
                     currentColor = Color3.fromHSV(hue, sat, val)
                     ColorPreview.BackgroundColor3 = currentColor
+                    ColorPreview.BackgroundTransparency = 1 - alpha
                     ValueSlider.UIGradient.Color = ColorSequence.new({
                         ColorSequenceKeypoint.new(0, Color3.fromHSV(hue, sat, 1)),
                         ColorSequenceKeypoint.new(1, Color3.new(0,0,0))
                     })
-                    if callback then callback(currentColor) end
+                    AlphaSlider.UIGradient.Color = ColorSequence.new({
+                        ColorSequenceKeypoint.new(0, currentColor),
+                        ColorSequenceKeypoint.new(1, currentColor)
+                    })
+                    if callback then callback(currentColor, alpha) end
                 end
 
                 local function SetWheelPositionFromColor()
@@ -1312,9 +1608,10 @@ function Library:CreateWindow(options)
                     local y = r * math.sin(theta)
                     WheelRing.Position = UDim2.new(0, center.X + x, 0, center.Y - y) -- y inverted for UI
                     ValueLine.Position = UDim2.new(0, -2, 1 - val, 0)
+                    AlphaLine.Position = UDim2.new(0, -2, 1 - alpha, 0)
                 end
 
-                local wheelDragging, valDragging = false, false
+                local wheelDragging, valDragging, alphaDragging = false, false, false
 
                 local function UpdateWheel(input)
                     local center = Wheel.AbsolutePosition + (Wheel.AbsoluteSize / 2)
@@ -1338,6 +1635,13 @@ function Library:CreateWindow(options)
                     ValueLine.Position = UDim2.new(0, -2, 0, y)
                     UpdateColor()
                 end
+                
+                local function UpdateAlpha(input)
+                    local y = math.clamp(input.Position.Y - AlphaSlider.AbsolutePosition.Y, 0, AlphaSlider.AbsoluteSize.Y)
+                    alpha = 1 - (y / AlphaSlider.AbsoluteSize.Y)
+                    AlphaLine.Position = UDim2.new(0, -2, 0, y)
+                    UpdateColor()
+                end
 
                 Wheel.InputBegan:Connect(function(input)
                     if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
@@ -1351,15 +1655,22 @@ function Library:CreateWindow(options)
                         UpdateValue(input)
                     end
                 end)
+                AlphaSlider.InputBegan:Connect(function(input)
+                    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+                        alphaDragging = true
+                        UpdateAlpha(input)
+                    end
+                end)
                 UserInputService.InputEnded:Connect(function(input)
                     if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-                        wheelDragging, valDragging = false, false
+                        wheelDragging, valDragging, alphaDragging = false, false, false
                     end
                 end)
                 UserInputService.InputChanged:Connect(function(input)
                     if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
                         if wheelDragging then UpdateWheel(input) end
                         if valDragging then UpdateValue(input) end
+                        if alphaDragging then UpdateAlpha(input) end
                     end
                 end)
 
@@ -1392,10 +1703,18 @@ function Library:CreateWindow(options)
                     end
                 end
                 API.GetValue = function() return currentColor end
+                if flag then Library.Flags[flag] = API end
                 return API
             end
 
-            function SecObj:CreateToggle(label, default, callback)
+            function SecObj:CreateToggle(configOrLabel, defaultVal, callbackFunc)
+                local config = type(configOrLabel) == "table" and configOrLabel or {Name = configOrLabel, Default = defaultVal, Callback = callbackFunc}
+                local label = config.Name or "Toggle"
+                local default = config.Default or false
+                local callback = config.Callback
+                local tooltip = config.Tooltip
+                local flag = config.Flag
+
                 local state = default or false
                 local TogBtn = Create("TextButton", {
                     BackgroundColor3 = Theme.MainBackground,
@@ -1407,6 +1726,7 @@ function Library:CreateWindow(options)
                     Create("UIStroke", { Color = Theme.Border, Thickness = 1 })
                 })
                 TogBtn.Parent = SecFrame
+                AddTooltip(TogBtn, tooltip)
 
                 Create("TextLabel", {
                     BackgroundTransparency = 1,
@@ -1454,6 +1774,7 @@ function Library:CreateWindow(options)
                     SetState(newState)
                 end
                 API.GetValue = function() return state end
+                if flag then Library.Flags[flag] = API end
                 return API
             end
 
@@ -1474,6 +1795,29 @@ function Library:CreateWindow(options)
                 Btn.MouseEnter:Connect(function() Tween(Btn, {BackgroundColor3 = Color3.fromRGB(Theme.ButtonBackground.R * 255 + 10, Theme.ButtonBackground.G * 255 + 10, Theme.ButtonBackground.B * 255 + 10)}, 0.1) end)
                 Btn.MouseLeave:Connect(function() Tween(Btn, {BackgroundColor3 = Theme.ButtonBackground}, 0.1) end)
                 Btn.MouseButton1Click:Connect(function() if callback then callback() end end)
+            end
+
+            function SecObj:CreateLabel(text)
+                local Lbl = Create("TextLabel", {
+                    BackgroundTransparency = 1,
+                    Size = UDim2.new(1, 0, 0, 0),
+                    AutomaticSize = Enum.AutomaticSize.Y,
+                    Font = Enum.Font.Ubuntu,
+                    Text = text,
+                    TextColor3 = Theme.TextSecondary,
+                    TextSize = 13,
+                    TextWrapped = true,
+                    TextXAlignment = Enum.TextXAlignment.Left
+                })
+                Lbl.Parent = SecFrame
+                
+                local API = {}
+                API.Set = function(arg1, arg2)
+                    local newTxt = (arg1 == API) and arg2 or arg1
+                    Lbl.Text = tostring(newTxt)
+                end
+                API.GetValue = function() return Lbl.Text end
+                return API
             end
 
             function SecObj:CreateInfo(title, text)
