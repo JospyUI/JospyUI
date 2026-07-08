@@ -18,8 +18,8 @@ local SettingsTab = Window:CreateTab("Settings")
 -- ==========================================
 local AimbotSection = CombatTab:CreateSection("Aimbot Settings")
 
--- Paragraph (Information text)
-AimbotSection:CreateParagraph("Welcome to K-UI! This is a paragraph. It's great for showing instructions, warnings, or general information to the user.")
+-- Label (Information text)
+AimbotSection:CreateLabel("Welcome to K-UI! This is a label. It's great for showing instructions, warnings, or general information to the user.")
 
 -- Toggle
 AimbotSection:CreateToggle({
