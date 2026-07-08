@@ -96,9 +96,9 @@ ESPSection:CreateColorPicker({
 
 
 -- ==========================================
--- SETTINGS TAB
+-- MISC / OTHER
 -- ==========================================
-local MiscSection = SettingsTab:CreateSection("Miscellaneous")
+local MiscSection = CombatTab:CreateSection("Miscellaneous")
 
 -- Keybind
 MiscSection:CreateKeybind({
