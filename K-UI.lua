@@ -1400,6 +1400,7 @@ function Library:CreateWindow(options)
                 local tooltip = config.Tooltip
                 local flag = config.Flag
                 local mode = config.Mode or "Toggle" -- Toggle, Hold, Always
+                local onBind = config.OnBind
 
                 local currentKey = defaultKey or Enum.KeyCode.Unknown
                 local binding = false
@@ -1477,6 +1478,7 @@ function Library:CreateWindow(options)
                             BindLabel.Text = key.Name
                         end
                         binding = false
+                        if onBind then onBind(currentKey) end
                     end
                 end)
                 
@@ -2008,7 +2010,7 @@ function Library:CreateWindow(options)
         Name = "Toggle UI Key",
         Default = Library.ToggleKey,
         Tooltip = "The key used to hide and show this menu.",
-        Callback = function(key)
+        OnBind = function(key)
             Library.ToggleKey = key
         end
     })
