@@ -20,5 +20,8 @@
   "homepage": "https://github.com/JospyUI/JospyUI#readme",
   "devDependencies": {
     "vitepress": "^1.6.4"
+  },
+  "dependencies": {
+    "luamin": "^1.0.4"
   }
 }
