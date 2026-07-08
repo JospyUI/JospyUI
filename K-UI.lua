@@ -841,26 +841,6 @@ function Library:CreateWindow(options)
                 end
                 
 
-                local SearchBox
-                if searchable then
-                    SearchBox = Create("TextBox", {
-                        BackgroundColor3 = Theme.MainBackground,
-                        Size = UDim2.new(1, 0, 0, 30),
-                        Visible = false,
-                        Font = Enum.Font.Ubuntu,
-                        PlaceholderText = "Search...",
-                        Text = "",
-                        TextColor3 = Theme.TextPrimary,
-                        TextSize = 13,
-                        ClearTextOnFocus = false
-                    }, {
-                        Create("UICorner", { CornerRadius = UDim.new(0, 4) }),
-                        Create("UIStroke", { Color = Theme.Border, Thickness = 1 }),
-                        Create("UIPadding", { PaddingLeft = UDim.new(0, 5) })
-                    })
-                    SearchBox.Parent = DropContainer
-                end
-                
                 local DropList = Create("Frame", {
                     BackgroundColor3 = Theme.HeaderButtonBackground,
                     Size = UDim2.new(1, 0, 0, 0),

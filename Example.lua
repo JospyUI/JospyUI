@@ -50,6 +50,7 @@ AimbotSection:CreateDropdown({
     Name = "Target Part (Searchable)",
     Options = {"Head", "Torso", "HumanoidRootPart", "Left Arm", "Right Arm", "Left Leg", "Right Leg"},
     Default = "Head",
+    Searchable = true,
     Tooltip = "Select which body part the aimbot should lock onto. You can type to search!",
     Flag = "TargetPart",
     Callback = function(selected)
