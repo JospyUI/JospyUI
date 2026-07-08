@@ -1371,6 +1371,15 @@ function Library:CreateWindow(options)
                     if callback then callback(value) end
                 end
                 API.GetValue = function() return value end
+                API.SetValue = function(val) API.Set(val) end
+                API.SetVisible = function(state) SliderContainer.Visible = state end
+                API.SetDisabled = function(state) 
+                    SliderContainer.Active = not state 
+                    TitleLabel.TextTransparency = state and 0.5 or 0
+                end
+                API.SetTitle = function(title) TitleLabel.Text = title end
+                API.SetDescription = function(desc) AddTooltip(SliderContainer, desc) end
+                API.OnChanged = function(func) callback = func end
                 if flag then Library.Flags[flag] = API end
                 return API
             end
@@ -1556,6 +1565,15 @@ function Library:CreateWindow(options)
                     BindLabel.Text = key == Enum.KeyCode.Unknown and "None" or key.Name
                 end
                 API.GetValue = function() return currentKey end
+                API.SetValue = function(val) API.Set(val) end
+                API.SetVisible = function(state) BindContainer.Visible = state end
+                API.SetDisabled = function(state) 
+                    BindBtn.Active = not state 
+                    KeyTitleLbl.TextTransparency = state and 0.5 or 0
+                end
+                API.SetTitle = function(title) KeyTitleLbl.Text = title end
+                API.SetDescription = function(desc) AddTooltip(BindContainer, desc) end
+                API.OnChanged = function(func) onBind = func end
                 if flag then Library.Flags[flag] = API end
                 return API
             end
