@@ -686,12 +686,14 @@ function Library:CreateWindow(options)
 
                 local function AddTooltip(parent, text)
                     if not text then return end
-                    local InfoIcon = Create("ImageLabel", {
+                    local InfoIcon = Create("TextLabel", {
                         BackgroundTransparency = 1,
                         Position = UDim2.new(1, -25, 0.5, -10),
                         Size = UDim2.new(0, 20, 0, 20),
-                        Image = "rbxassetid://6031094678",
-                        ImageColor3 = Theme.TextSecondary,
+                        Font = Enum.Font.Ubuntu,
+                        Text = "?",
+                        TextColor3 = Theme.TextSecondary,
+                        TextSize = 14,
                         Parent = parent,
                         ZIndex = parent.ZIndex + 1
                     })
