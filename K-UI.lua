@@ -363,7 +363,7 @@ function Library:CreateWindow(options)
         BackgroundTransparency = 1,
         Position = UDim2.new(0, 20, 0.5, -15),
         Size = UDim2.new(0, 30, 0, 30),
-        Image = Library.Icons.Moon,
+        Image = Library.GetIcon("lucide-moon"),
         ImageColor3 = Theme.Accent
     })
     MoonIcon.Parent = Header
@@ -464,9 +464,9 @@ function Library:CreateWindow(options)
         return Btn
     end
 
-    local SettingsBtn = CreateHeaderBtn(Library.Icons.Settings, nil, 1)
-    local HideBtn = CreateHeaderBtn(Library.Icons.EyeSlash, nil, 2)
-    local CloseBtn = CreateHeaderBtn(Library.Icons.Power, Color3.fromRGB(220, 60, 60), 3)
+    local SettingsBtn = CreateHeaderBtn(Library.GetIcon("lucide-settings"), nil, 1)
+    local HideBtn = CreateHeaderBtn(Library.GetIcon("lucide-eye-off"), nil, 2)
+    local CloseBtn = CreateHeaderBtn(Library.GetIcon("lucide-power"), Color3.fromRGB(220, 60, 60), 3)
     
     SettingsBtn.Parent = HeaderRight
     HideBtn.Parent = HeaderRight
@@ -2273,7 +2273,7 @@ function Library:CreateWindow(options)
         ScreenGui:Destroy()
     end)
 
-    local SettingsTab = WindowObj:CreateTab("Settings", Library.Icons.Settings)
+    local SettingsTab = WindowObj:CreateTab("Settings", Library.GetIcon("lucide-settings"))
     SettingsTab:Hide() -- Hide from left sidebar, only accessible via top right cogwheel
     
     SettingsBtn.MouseButton1Click:Connect(function()
@@ -2289,6 +2289,150 @@ function Library:CreateWindow(options)
             Library.ToggleKey = key
         end
     })
+
+    local ConfigSection = SettingsTab:CreateSection("Configuration")
+    
+    local ConfigFolder = "BlueMoonUI_Configs"
+    if makefolder and not isfolder(ConfigFolder) then
+        pcall(function() makefolder(ConfigFolder) end)
+    end
+    
+    local function GetConfigs()
+        local list = {}
+        if listfiles and isfolder(ConfigFolder) then
+            for _, file in ipairs(listfiles(ConfigFolder)) do
+                local name = file:match("([^\\]+)$") or file:match("([^/]+)$") or file
+                name = name:gsub("%.json$", "")
+                if name ~= "autoload.txt" then
+                    table.insert(list, name)
+                end
+            end
+        end
+        return #list > 0 and list or {"No Configs Found"}
+    end
+
+    local ConfigDropdown = ConfigSection:CreateDropdown({
+        Name = "Select Config",
+        Options = GetConfigs(),
+        Default = "No Configs Found",
+        Searchable = true
+    })
+
+    local ConfigNameBox = ConfigSection:CreateTextBox({
+        Name = "Config Name",
+        Placeholder = "Type config name to save..."
+    })
+    
+    ConfigSection:CreateButton("Create / Overwrite Config", function()
+        local name = ConfigNameBox.GetValue()
+        if not name or name == "" then return end
+        
+        local dataToSave = {}
+        for flag, api in pairs(Library.Flags) do
+            local val = api.GetValue()
+            if typeof(val) == "Color3" then
+                dataToSave[flag] = {R = val.R, G = val.G, B = val.B, Type = "Color3"}
+            elseif typeof(val) == "EnumItem" then
+                dataToSave[flag] = {Value = val.Name, Type = "EnumItem"}
+            else
+                dataToSave[flag] = val
+            end
+        end
+        
+        if writefile then
+            pcall(function()
+                local json = game:GetService("HttpService"):JSONEncode(dataToSave)
+                writefile(ConfigFolder .. "/" .. name .. ".json", json)
+                ConfigDropdown.SetOptions(GetConfigs())
+                Library:Notify("Success", "Config '" .. name .. "' saved!", 3)
+            end)
+        else
+            Library:Notify("Error", "Your executor does not support writing files.", 3)
+        end
+    end)
+    
+    ConfigSection:CreateButton("Load Config", function()
+        local selected = ConfigDropdown.GetValue()
+        if selected == "No Configs Found" or selected == "" then return end
+        
+        local path = ConfigFolder .. "/" .. selected .. ".json"
+        if isfile and isfile(path) and readfile then
+            local success, json = pcall(function() return readfile(path) end)
+            if success and json then
+                local decodeSuccess, data = pcall(function() return game:GetService("HttpService"):JSONDecode(json) end)
+                if decodeSuccess and data then
+                    for flag, val in pairs(data) do
+                        if Library.Flags[flag] then
+                            if type(val) == "table" and val.Type == "Color3" then
+                                Library.Flags[flag].SetValue(Color3.new(val.R, val.G, val.B))
+                            elseif type(val) == "table" and val.Type == "EnumItem" then
+                                local ok, enumKey = pcall(function() return Enum.KeyCode[val.Value] end)
+                                if ok then Library.Flags[flag].SetValue(enumKey) end
+                            else
+                                Library.Flags[flag].SetValue(val)
+                            end
+                        end
+                    end
+                    Library:Notify("Success", "Config '" .. selected .. "' loaded!", 3)
+                end
+            end
+        else
+            Library:Notify("Error", "Config file not found or executor unsupported.", 3)
+        end
+    end)
+    
+    ConfigSection:CreateButton("Delete Config", function()
+        local selected = ConfigDropdown.GetValue()
+        if selected == "No Configs Found" or selected == "" then return end
+        local path = ConfigFolder .. "/" .. selected .. ".json"
+        if isfile and isfile(path) and delfile then
+            pcall(function() delfile(path) end)
+            ConfigDropdown.SetOptions(GetConfigs())
+            Library:Notify("Success", "Config '" .. selected .. "' deleted!", 3)
+        end
+    end)
+    
+    ConfigSection:CreateButton("Set as Auto-Load", function()
+        local selected = ConfigDropdown.GetValue()
+        if selected == "No Configs Found" or selected == "" then return end
+        if writefile then
+            pcall(function()
+                writefile(ConfigFolder .. "/autoload.txt", selected)
+                Library:Notify("Auto-Load Set", "Config '" .. selected .. "' will load automatically on execute.", 4)
+            end)
+        end
+    end)
+    
+    -- Check Autoload on Init
+    task.spawn(function()
+        if isfile and readfile and isfile(ConfigFolder .. "/autoload.txt") then
+            local success, autoName = pcall(function() return readfile(ConfigFolder .. "/autoload.txt") end)
+            if success and autoName and autoName ~= "" then
+                local path = ConfigFolder .. "/" .. autoName .. ".json"
+                if isfile(path) then
+                    local readSuccess, json = pcall(function() return readfile(path) end)
+                    if readSuccess and json then
+                        local decodeSuccess, data = pcall(function() return game:GetService("HttpService"):JSONDecode(json) end)
+                        if decodeSuccess and data then
+                            for flag, val in pairs(data) do
+                                if Library.Flags[flag] then
+                                    if type(val) == "table" and val.Type == "Color3" then
+                                        Library.Flags[flag].SetValue(Color3.new(val.R, val.G, val.B))
+                                    elseif type(val) == "table" and val.Type == "EnumItem" then
+                                        local ok, enumKey = pcall(function() return Enum.KeyCode[val.Value] end)
+                                        if ok then Library.Flags[flag].SetValue(enumKey) end
+                                    else
+                                        Library.Flags[flag].SetValue(val)
+                                    end
+                                end
+                            end
+                            Library:Notify("Auto-Loaded", "Config '" .. autoName .. "' loaded successfully!", 4)
+                        end
+                    end
+                end
+            end
+        end
+    end)
 
     local InfoSettings = SettingsTab:CreateSection("Information")
     InfoSettings:CreateInfo("Framework", "Powered by K-UI Library\nDeveloped by ijosephk")
