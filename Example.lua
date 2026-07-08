@@ -16,7 +16,6 @@ local ModuleTab = Window:CreateTab("All Modules", "lucide-layout-list")
 local ApiTab = Window:CreateTab("API Showcase", "lucide-code-xml")
 local DisableTab = Window:CreateTab("Toggle Control (Özel)", "lucide-power-off")
 local EspTab = Window:CreateTab("Live Updates", "lucide-eye")
-local SettingTab = Window:CreateTab("Settings", "lucide-settings")
 
 -- ==========================================
 -- TAB 1: ALL MODULES (Features)
@@ -206,11 +205,6 @@ local EspRefreshButton = EspSection:CreateButton("Refresh Player List", function
     PlayerDropdown.SetOptions(GetPlayerNames())
     K_UI:Notify("Refreshed", "Player list has been successfully updated!", 2)
 end)
-
--- ==========================================
--- TAB 5: SETTINGS
--- ==========================================
-K_UI:BuildSettingsTab(SettingTab)
 
 -- Notification Example
 K_UI:Notify("Welcome!", "K-UI has successfully loaded the Full Showcase.", 5)

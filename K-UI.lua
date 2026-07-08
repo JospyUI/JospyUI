@@ -2001,7 +2001,9 @@ function Library:CreateWindow(options)
                     if callback then callback(state) end
                 end
 
+                local isDisabled = false
                 TogBtn.MouseButton1Click:Connect(function()
+                    if isDisabled then return end
                     SetState(not state)
                 end)
                 
@@ -2013,8 +2015,9 @@ function Library:CreateWindow(options)
                 API.GetValue = function() return state end
                 API.SetValue = function(val) API.Set(val) end
                 API.SetVisible = function(state) TogBtn.Visible = state end
-                API.SetDisabled = function(state) 
-                    TogBtn.Interactable = not state 
+                API.SetDisabled = function(state)
+                    isDisabled = state
+                    pcall(function() TogBtn.Interactable = not state end)
                     TogBtn.AutoButtonColor = not state
                     TogLbl.TextTransparency = state and 0.5 or 0
                 end
@@ -2045,13 +2048,15 @@ function Library:CreateWindow(options)
                 })
                 Btn.Parent = SecFrame
 
-                Btn.MouseEnter:Connect(function() Tween(Btn, {BackgroundColor3 = Color3.fromRGB(Theme.ButtonBackground.R * 255 + 10, Theme.ButtonBackground.G * 255 + 10, Theme.ButtonBackground.B * 255 + 10)}, 0.1) end)
-                Btn.MouseLeave:Connect(function() Tween(Btn, {BackgroundColor3 = Theme.ButtonBackground}, 0.1) end)
-                Btn.MouseButton1Click:Connect(function() if callback then callback() end end)
+                local isDisabled = false
+                Btn.MouseEnter:Connect(function() if not isDisabled then Tween(Btn, {BackgroundColor3 = Color3.fromRGB(Theme.ButtonBackground.R * 255 + 10, Theme.ButtonBackground.G * 255 + 10, Theme.ButtonBackground.B * 255 + 10)}, 0.1) end end)
+                Btn.MouseLeave:Connect(function() if not isDisabled then Tween(Btn, {BackgroundColor3 = Theme.ButtonBackground}, 0.1) end end)
+                Btn.MouseButton1Click:Connect(function() if not isDisabled and callback then callback() end end)
                 local API = {}
                 API.SetVisible = function(state) Btn.Visible = state end
                 API.SetDisabled = function(state) 
-                    Btn.Interactable = not state 
+                    isDisabled = state
+                    pcall(function() Btn.Interactable = not state end)
                     Btn.TextTransparency = state and 0.5 or 0
                 end
                 API.SetTitle = function(title) Btn.Text = title end
