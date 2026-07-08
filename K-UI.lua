@@ -760,13 +760,13 @@ function Library:CreateWindow(options)
                     Create("UIListLayout", { SortOrder = Enum.SortOrder.LayoutOrder, Padding = UDim.new(0, 5) })
                 })
                 DropContainer.Parent = SecFrame
-                AddTooltip(TopBar, tooltip)
 
                 local TopBar = Create("Frame", {
                     BackgroundTransparency = 1,
                     Size = UDim2.new(1, 0, 0, 30)
                 })
                 TopBar.Parent = DropContainer
+                AddTooltip(TopBar, tooltip)
 
                 Create("TextLabel", {
                     BackgroundTransparency = 1,
@@ -982,13 +982,13 @@ function Library:CreateWindow(options)
                     Create("UIListLayout", { SortOrder = Enum.SortOrder.LayoutOrder, Padding = UDim.new(0, 5) })
                 })
                 DropContainer.Parent = SecFrame
-                AddTooltip(TopBar, tooltip)
 
                 local TopBar = Create("Frame", {
                     BackgroundTransparency = 1,
                     Size = UDim2.new(1, 0, 0, 30)
                 })
                 TopBar.Parent = DropContainer
+                AddTooltip(TopBar, tooltip)
 
                 Create("TextLabel", {
                     BackgroundTransparency = 1,
@@ -1496,13 +1496,13 @@ function Library:CreateWindow(options)
                     })
                 })
                 CPContainer.Parent = SecFrame
-                AddTooltip(TopBar, tooltip)
 
                 local TopBar = Create("Frame", {
                     BackgroundTransparency = 1,
                     Size = UDim2.new(1, 0, 0, 30)
                 })
                 TopBar.Parent = CPContainer
+                AddTooltip(TopBar, tooltip)
 
                 Create("TextLabel", {
                     BackgroundTransparency = 1,
