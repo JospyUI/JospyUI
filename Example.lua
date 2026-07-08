@@ -58,13 +58,9 @@ AimbotSection:CreateDropdown({
 })
 
 -- Button
-AimbotSection:CreateButton({
-    Name = "Reset Aimbot Target",
-    Tooltip = "Clears your current aimbot target immediately.",
-    Callback = function()
-        print("Aimbot target reset!")
-    end
-})
+AimbotSection:CreateButton("Reset Aimbot Target", function()
+    print("Aimbot target reset!")
+end)
 
 
 -- ==========================================
@@ -128,24 +124,16 @@ MiscSection:CreateTextBox({
 
 local ConfigSection = SettingsTab:CreateSection("Configuration System")
 
-ConfigSection:CreateButton({
-    Name = "Save Config",
-    Tooltip = "Saves your current settings to your workspace folder.",
-    Callback = function()
-        -- Saves all elements that have a 'Flag' assigned to them.
-        Window:SaveConfig("K_UI_Configs", "MyShowcaseConfig")
-        print("Config saved!")
-    end
-})
+ConfigSection:CreateButton("Save Config", function()
+    -- Saves all elements that have a 'Flag' assigned to them.
+    Window:SaveConfig("K_UI_Configs", "MyShowcaseConfig")
+    print("Config saved!")
+end)
 
-ConfigSection:CreateButton({
-    Name = "Load Config",
-    Tooltip = "Loads your settings from your workspace folder.",
-    Callback = function()
-        Window:LoadConfig("K_UI_Configs", "MyShowcaseConfig")
-        print("Config loaded!")
-    end
-})
+ConfigSection:CreateButton("Load Config", function()
+    Window:LoadConfig("K_UI_Configs", "MyShowcaseConfig")
+    print("Config loaded!")
+end)
 
 -- Finally, switch to the first tab when the UI loads.
 Window:SelectTab("Combat")
