@@ -511,8 +511,7 @@ UtilitySection:CreateButton("Rejoin Server", function()
                 Name = "Yes, Rejoin",
                 Callback = function()
                     if #Players:GetPlayers() <= 1 then
-                        LocalPlayer:Kick("
-Rejoining...")
+                        LocalPlayer:Kick("\nRejoining...")
                         task.wait()
                         TeleportService:Teleport(game.PlaceId, LocalPlayer)
                     else
