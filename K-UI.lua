@@ -84,6 +84,37 @@ function Library.GetExecutor()
     return "Unknown", "1.0"
 end
 
+function Library.GetIcon(iconName)
+    if type(iconName) ~= "string" or iconName == "" then return "" end
+    if string.find(iconName, "rbxassetid://") then return iconName end
+    
+    -- Check local custom icons first
+    if Library.Icons[iconName] then return Library.Icons[iconName] end
+
+    -- Load Lucide icons lazily if needed
+    if not Library.LucideIcons then
+        local success, result = pcall(function()
+            return loadstring(game:HttpGet("https://raw.githubusercontent.com/GeceUstasi/BlueMoonUI/master/Icons.lua"))()
+        end)
+        if success and type(result) == "table" and result.assets then
+            Library.LucideIcons = result.assets
+        else
+            Library.LucideIcons = {}
+        end
+    end
+    
+    local lucideName = iconName
+    if not string.find(lucideName, "lucide%-") then
+        lucideName = "lucide-" .. lucideName
+    end
+    
+    if Library.LucideIcons[lucideName] then
+        return Library.LucideIcons[lucideName]
+    end
+    
+    return ""
+end
+
 
 function Library:SaveConfig(folderName, fileName)
     if not isfolder or not writefile then return false end
@@ -615,6 +646,8 @@ function Library:CreateWindow(options)
     local WindowObj = { CurrentTab = nil }
 
     function WindowObj:CreateTab(name, iconId)
+        local actualIcon = Library.GetIcon(iconId)
+        
         local TabBtn = Create("TextButton", {
             BackgroundColor3 = Theme.MainBackground,
             Size = UDim2.new(1, 0, 0, 38),
@@ -629,15 +662,16 @@ function Library:CreateWindow(options)
             BackgroundTransparency = 1,
             Position = UDim2.new(0, 15, 0.5, -9),
             Size = UDim2.new(0, 18, 0, 18),
-            Image = iconId or "",
-            ImageColor3 = Theme.TextSecondary
+            Image = actualIcon,
+            ImageColor3 = Theme.TextSecondary,
+            Visible = (actualIcon ~= "")
         })
         TabIcon.Parent = TabBtn
 
         local TabLabel = Create("TextLabel", {
             BackgroundTransparency = 1,
-            Position = UDim2.new(0, 45, 0, 0),
-            Size = UDim2.new(1, -45, 1, 0),
+            Position = UDim2.new(0, (actualIcon == "") and 15 or 45, 0, 0),
+            Size = UDim2.new(1, (actualIcon == "") and -15 or -45, 1, 0),
             Font = Enum.Font.Ubuntu,
             Text = name,
             TextColor3 = Theme.TextPrimary,

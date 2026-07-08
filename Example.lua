@@ -15,10 +15,10 @@ local Window = K_UI:CreateWindow("K-UI Full API Showcase", {
 print("Successfully initialized on Executor:", K_UI.GetExecutor())
 
 -- 3. Create Tabs
-local ModuleTab = Window:CreateTab("All Modules")
-local ApiTab = Window:CreateTab("API Showcase")
-local EspTab = Window:CreateTab("ESP Example")
-local SettingTab = Window:CreateTab("Settings")
+local ModuleTab = Window:CreateTab("All Modules", "lucide-layout-list")
+local ApiTab = Window:CreateTab("API Showcase", "lucide-code-xml")
+local EspTab = Window:CreateTab("ESP Example", "lucide-eye")
+local SettingTab = Window:CreateTab("Settings", "lucide-settings")
 
 -- ==========================================
 -- TAB 1: ALL MODULES (Features)
