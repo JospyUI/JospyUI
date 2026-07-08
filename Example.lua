@@ -4,7 +4,7 @@
 -- Features: ESP, Aimbot, Fly, Inf Jump, Spectate, Noclip, Rejoin, and more!
 -- ==============================================================================
 
-local K_UI = loadstring(game:HttpGet("https://raw.githubusercontent.com/GeceUstasi/BlueMoonUI/495301f9d73b2fc701c15b1727cd4fe543dae5c1/K-UI.lua"))()
+local K_UI = loadstring(game:HttpGet("https://raw.githubusercontent.com/GeceUstasi/BlueMoonUI/65a77f9bbd3a41ad8befa315a474e50779ff3759/K-UI.lua"))()
 
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
@@ -20,6 +20,23 @@ local Window = K_UI:CreateWindow("Universal Hub", {
     Ping = true,
     ToggleKey = Enum.KeyCode.RightShift
 })
+
+-- Watermark Setup
+local Watermark = Window:CreateWatermark("Blue Moon Hub | FPS: 0 | Ping: 0ms")
+local lastTick = tick()
+local frames = 0
+RunService.RenderStepped:Connect(function()
+    frames = frames + 1
+    if tick() - lastTick >= 1 then
+        local fps = frames
+        local ping = math.floor(LocalPlayer:GetNetworkPing() * 1000)
+        local timeStr = os.date("%X")
+        Watermark:SetText(string.format("<b>Blue Moon</b> | FPS: %d | Ping: %dms | %s", fps, ping, timeStr))
+        frames = 0
+        lastTick = tick()
+    end
+end)
+
 
 -- TABS
 local LocalTab = Window:CreateTab("LocalPlayer", K_UI.GetIcon("lucide-user"))
@@ -486,13 +503,28 @@ SpectateSection:CreateToggle({
 local UtilitySection = MiscTab:CreateSection("Utility")
 
 UtilitySection:CreateButton("Rejoin Server", function()
-    if #Players:GetPlayers() <= 1 then
-        LocalPlayer:Kick("\nRejoining...")
-        task.wait()
-        TeleportService:Teleport(game.PlaceId, LocalPlayer)
-    else
-        TeleportService:TeleportToPlaceInstance(game.PlaceId, game.JobId, LocalPlayer)
-    end
+    Window:CreateDialog({
+        Title = "Rejoin Server",
+        Message = "Are you sure you want to leave and rejoin this server? Your current progress might not be saved if you are in combat.",
+        Buttons = {
+            {
+                Name = "Yes, Rejoin",
+                Callback = function()
+                    if #Players:GetPlayers() <= 1 then
+                        LocalPlayer:Kick("
+Rejoining...")
+                        task.wait()
+                        TeleportService:Teleport(game.PlaceId, LocalPlayer)
+                    else
+                        TeleportService:TeleportToPlaceInstance(game.PlaceId, game.JobId, LocalPlayer)
+                    end
+                end
+            },
+            {
+                Name = "Cancel"
+            }
+        }
+    })
 end)
 
 UtilitySection:CreateButton("Server Hop", function()
