@@ -113,7 +113,7 @@ function Library.GetIcon(iconName)
     -- Load Lucide icons lazily if needed
     if not Library.LucideIcons then
         local success, result = pcall(function()
-            return loadstring(game:HttpGet("https://raw.githubusercontent.com/GeceUstasi/BlueMoonUI/master/Icons.lua"))()
+            return loadstring(game:HttpGet("https://raw.githubusercontent.com/GeceUstasi/JospyUI/master/Icons.lua"))()
         end)
         if success and type(result) == "table" and result.assets then
             Library.LucideIcons = result.assets
@@ -167,7 +167,7 @@ end
 
 function Library:CreateWindow(options)
     options = options or {}
-    local Title = options.Title or "Blue Moon"
+    local Title = options.Title or "Jospy"
     local Version = options.Version or "v1.1.2 Alpha"
     local ProfileName = options.ProfileName or Players.LocalPlayer and Players.LocalPlayer.Name or "XxGECEUSTASIxX"
     local Ping = options.Ping or "106 ms"
@@ -2306,7 +2306,7 @@ function Library:CreateWindow(options)
 
     local ConfigSection = SettingsTab:CreateSection("Configuration")
     
-    local ConfigFolder = "BlueMoonUI_Configs"
+    local ConfigFolder = "JospyUI_Configs"
     if makefolder and not isfolder(ConfigFolder) then
         pcall(function() makefolder(ConfigFolder) end)
     end
@@ -2682,7 +2682,7 @@ function Library:CreateKeySystem(options)
     options = options or {}
     local Theme = self.Themes
     local keyUrl = options.KeyUrl or ""
-    local title = options.Title or "Blue Moon Key System"
+    local title = options.Title or "Jospy Key System"
     local expectedKey = options.Key or ""
 
     local KeyGui = Instance.new("ScreenGui")

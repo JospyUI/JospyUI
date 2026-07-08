@@ -1,10 +1,10 @@
 -- ==============================================================================
--- Blue Moon - Universal Hub
+-- Jospy - Universal Hub
 -- A fully featured universal script demonstrating K-UI capabilities
 -- Features: ESP, Aimbot, Fly, Inf Jump, Spectate, Noclip, Rejoin, and more!
 -- ==============================================================================
 
-local K_UI = loadstring(game:HttpGet("https://raw.githubusercontent.com/GeceUstasi/BlueMoonUI/65a77f9bbd3a41ad8befa315a474e50779ff3759/K-UI.lua"))()
+local K_UI = loadstring(game:HttpGet("https://raw.githubusercontent.com/ijosephyusufk-dev/JospyUI/65a77f9bbd3a41ad8befa315a474e50779ff3759/K-UI.lua"))()
 
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
