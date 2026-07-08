@@ -55,6 +55,40 @@ local function Tween(instance, properties, duration, easingStyle, easingDirectio
     return tween
 end
 
+Library.Flags = {}
+
+local HttpService = game:GetService("HttpService")
+
+function Library:SaveConfig(folderName, fileName)
+    if not isfolder or not writefile then return false end
+    if not isfolder(folderName) then makefolder(folderName) end
+    local data = {}
+    for flag, api in pairs(Library.Flags) do
+        data[flag] = api.GetValue()
+    end
+    writefile(folderName .. "/" .. fileName .. ".json", HttpService:JSONEncode(data))
+    return true
+end
+
+function Library:LoadConfig(folderName, fileName)
+    if not isfile or not readfile then return false end
+    local path = folderName .. "/" .. fileName .. ".json"
+    if isfile(path) then
+        local success, data = pcall(function()
+            return HttpService:JSONDecode(readfile(path))
+        end)
+        if success and type(data) == "table" then
+            for flag, val in pairs(data) do
+                if Library.Flags[flag] then
+                    Library.Flags[flag].Set(val)
+                end
+            end
+            return true
+        end
+    end
+    return false
+end
+
 function Library:CreateWindow(options)
     options = options or {}
     local Title = options.Title or "Blue Moon"
