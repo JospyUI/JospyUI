@@ -74,6 +74,7 @@ function Library.CopyToClipboard(text)
 end
 
 local HttpService = game:GetService("HttpService")
+
 local Lighting = game:GetService("Lighting")
 
 function Library.GetExecutor()
@@ -82,6 +83,7 @@ function Library.GetExecutor()
     end
     return "Unknown", "1.0"
 end
+
 
 function Library:SaveConfig(folderName, fileName)
     if not isfolder or not writefile then return false end
@@ -122,9 +124,6 @@ function Library:CreateWindow(options)
     local Theme = self.Themes
     
     -- Cleanup
-    if CoreGui:FindFirstChild("K-UI") then
-        CoreGui:FindFirstChild("K-UI"):Destroy()
-    end
 
     if CoreGui:FindFirstChild("K-UI") then
         CoreGui["K-UI"]:Destroy()
@@ -151,6 +150,7 @@ function Library:CreateWindow(options)
             Parent = Lighting
         })
     end
+
 
     -- Intro Animation
     local IntroFrame = Create("Frame", {
@@ -978,17 +978,7 @@ function Library:CreateWindow(options)
                     task.delay(0.2, function() TabContent.CanvasSize = UDim2.new(0, 0, 0, TabContent.UIListLayout.AbsoluteContentSize.Y + 40) end)
                 end)
                 
-                                local API = {}
-                API.SetValue = function(state) API.Set(state) end
-                API.SetVisible = function(state) ToggleBtn.Visible = state end
-                API.SetDisabled = function(state) 
-                    ToggleBtn.Active = not state 
-                    ToggleBtn.AutoButtonColor = not state
-                    ToggleBtn.TextTransparency = state and 0.5 or 0
-                end
-                API.SetTitle = function(title) TglLabel.Text = title end
-                API.SetDescription = function(desc) AddTooltip(ToggleBtn, desc) end
-                API.OnChanged = function(func) callback = func end
+                local API = {}
                 API.Set = function(arg1, arg2)
                     local newVal = (arg1 == API) and arg2 or arg1
                     selected = newVal
@@ -1013,6 +1003,16 @@ function Library:CreateWindow(options)
                     UpdateOptions(newOpts)
                 end
                 API.GetValue = function() return selected end
+                API.SetValue = function(val) API.Set(val) end
+                API.SetVisible = function(state) DropdownFrame.Visible = state end
+                API.SetDisabled = function(state) 
+                    ValBtn.Active = not state 
+                    DropLbl.TextTransparency = state and 0.5 or 0
+                end
+                API.SetTitle = function(title) DropLbl.Text = title end
+                API.SetDescription = function(desc) AddTooltip(ValBtn, desc) end
+                API.OnChanged = function(func) callback = func end
+                API.SetOptions = function(newOpts) API.Refresh(newOpts) end
                 if flag then Library.Flags[flag] = API end
                 return API
             end
@@ -1225,16 +1225,7 @@ function Library:CreateWindow(options)
                     task.delay(0.2, function() TabContent.CanvasSize = UDim2.new(0, 0, 0, TabContent.UIListLayout.AbsoluteContentSize.Y + 40) end)
                 end)
                 
-                                local API = {}
-                API.SetValue = function(val) API.Set(val) end
-                API.SetVisible = function(state) SliderMain.Visible = state end
-                API.SetDisabled = function(state) 
-                    SliderBtn.Active = not state 
-                    SliderLbl.TextTransparency = state and 0.5 or 0
-                end
-                API.SetTitle = function(title) SliderLbl.Text = title end
-                API.SetDescription = function(desc) AddTooltip(SliderBtn, desc) end
-                API.OnChanged = function(func) callback = func end
+                local API = {}
                 API.Set = function(arg1, arg2)
                     local newArray = (arg1 == API) and arg2 or arg1
                     selectedDict = {}
@@ -1265,6 +1256,16 @@ function Library:CreateWindow(options)
                     UpdateOptions(newOpts)
                 end
                 API.GetValue = function() return GetSelectedArray() end
+                API.SetValue = function(val) API.Set(val) end
+                API.SetVisible = function(state) DropdownFrame.Visible = state end
+                API.SetDisabled = function(state) 
+                    ValBtn.Active = not state 
+                    DropLbl.TextTransparency = state and 0.5 or 0
+                end
+                API.SetTitle = function(title) DropLbl.Text = title end
+                API.SetDescription = function(desc) AddTooltip(ValBtn, desc) end
+                API.OnChanged = function(func) callback = func end
+                API.SetOptions = function(newOpts) API.Refresh(newOpts) end
                 if flag then Library.Flags[flag] = API end
                 return API
             end
@@ -1359,21 +1360,7 @@ function Library:CreateWindow(options)
                     end
                 end)
                 
-                                local API = {}
-                API.SetValue = function(val) API.Set(val) end
-                API.SetVisible = function(state) DropdownFrame.Visible = state end
-                API.SetDisabled = function(state) 
-                    ValBtn.Active = not state 
-                    DropLbl.TextTransparency = state and 0.5 or 0
-                end
-                API.SetTitle = function(title) DropLbl.Text = title end
-                API.SetDescription = function(desc) AddTooltip(ValBtn, desc) end
-                API.OnChanged = function(func) callback = func end
-                API.SetOptions = function(newOpts)
-                    options = newOpts
-                    UpdateOptions(options)
-                end
-                API.Refresh = function() UpdateOptions(options) end
+                local API = {}
                 API.Set = function(arg1, arg2)
                     local newVal = (arg1 == API) and arg2 or arg1
                     value = math.clamp(tonumber(newVal) or min, min, max)
@@ -1440,27 +1427,22 @@ function Library:CreateWindow(options)
                     if callback then callback(TextBox.Text) end
                 end)
                 
-                                local API = {}
-                API.SetValue = function(val) API.Set(val) end
-                API.SetVisible = function(state) DropdownFrame.Visible = state end
-                API.SetDisabled = function(state) 
-                    ValBtn.Active = not state 
-                    DropLbl.TextTransparency = state and 0.5 or 0
-                end
-                API.SetTitle = function(title) DropLbl.Text = title end
-                API.SetDescription = function(desc) AddTooltip(ValBtn, desc) end
-                API.OnChanged = function(func) callback = func end
-                API.SetOptions = function(newOpts)
-                    options = newOpts
-                    UpdateOptions(options)
-                end
-                API.Refresh = function() UpdateOptions(options) end
+                local API = {}
                 API.Set = function(arg1, arg2)
                     local txt = (arg1 == API) and arg2 or arg1
                     TextBox.Text = tostring(txt)
                     if callback then callback(TextBox.Text) end
                 end
                 API.GetValue = function() return TextBox.Text end
+                API.SetValue = function(val) API.Set(val) end
+                API.SetVisible = function(state) BoxFrame.Visible = state end
+                API.SetDisabled = function(state) 
+                    TextBox.TextEditable = not state 
+                    BoxLbl.TextTransparency = state and 0.5 or 0
+                end
+                API.SetTitle = function(title) BoxLbl.Text = title end
+                API.SetDescription = function(desc) AddTooltip(TextBox, desc) end
+                API.OnChanged = function(func) callback = func end
                 if flag then Library.Flags[flag] = API end
                 return API
             end
@@ -1563,16 +1545,7 @@ function Library:CreateWindow(options)
                 end)
 
                 
-                                local API = {}
-                API.SetValue = function(val) API.Set(val) end
-                API.SetVisible = function(state) ColorFrame.Visible = state end
-                API.SetDisabled = function(state) 
-                    ColorBtn.Active = not state 
-                    ColorLbl.TextTransparency = state and 0.5 or 0
-                end
-                API.SetTitle = function(title) ColorLbl.Text = title end
-                API.SetDescription = function(desc) AddTooltip(ColorBtn, desc) end
-                API.OnChanged = function(func) callback = func end
+                local API = {}
                 API.Set = function(arg1, arg2)
                     local key = (arg1 == API) and arg2 or arg1
                     currentKey = key
@@ -1837,16 +1810,7 @@ function Library:CreateWindow(options)
                     end
                 end)
                 
-                                local API = {}
-                API.SetValue = function(val) API.Set(val) end
-                API.SetVisible = function(state) KeyFrame.Visible = state end
-                API.SetDisabled = function(state) 
-                    BindBtn.Active = not state 
-                    KeyLbl.TextTransparency = state and 0.5 or 0
-                end
-                API.SetTitle = function(title) KeyLbl.Text = title end
-                API.SetDescription = function(desc) AddTooltip(BindBtn, desc) end
-                API.OnChanged = function(func) onBind = func end
+                local API = {}
                 API.Set = function(arg1, arg2)
                     local newColor = (arg1 == API) and arg2 or arg1
                     if typeof(newColor) == "Color3" then
@@ -1856,6 +1820,15 @@ function Library:CreateWindow(options)
                     end
                 end
                 API.GetValue = function() return currentColor end
+                API.SetValue = function(val) API.Set(val) end
+                API.SetVisible = function(state) ColorFrame.Visible = state end
+                API.SetDisabled = function(state) 
+                    ColorBtn.Active = not state 
+                    ColorLbl.TextTransparency = state and 0.5 or 0
+                end
+                API.SetTitle = function(title) ColorLbl.Text = title end
+                API.SetDescription = function(desc) AddTooltip(ColorBtn, desc) end
+                API.OnChanged = function(func) callback = func end
                 if flag then Library.Flags[flag] = API end
                 return API
             end
@@ -1921,21 +1894,22 @@ function Library:CreateWindow(options)
                     SetState(not state)
                 end)
                 
-                                local API = {}
-                API.SetValue = function(val) API.Set(val) end
-                API.SetVisible = function(state) BoxFrame.Visible = state end
-                API.SetDisabled = function(state) 
-                    TextBox.TextEditable = not state 
-                    BoxLbl.TextTransparency = state and 0.5 or 0
-                end
-                API.SetTitle = function(title) BoxLbl.Text = title end
-                API.SetDescription = function(desc) AddTooltip(TextBox, desc) end
-                API.OnChanged = function(func) callback = func end
+                local API = {}
                 API.Set = function(arg1, arg2)
                     local newState = (arg1 == API) and arg2 or arg1
                     SetState(newState)
                 end
                 API.GetValue = function() return state end
+                API.SetValue = function(val) API.Set(val) end
+                API.SetVisible = function(state) ToggleBtn.Visible = state end
+                API.SetDisabled = function(state) 
+                    ToggleBtn.Active = not state 
+                    ToggleBtn.AutoButtonColor = not state
+                    ToggleBtn.TextTransparency = state and 0.5 or 0
+                end
+                API.SetTitle = function(title) TglLabel.Text = title end
+                API.SetDescription = function(desc) AddTooltip(ToggleBtn, desc) end
+                API.OnChanged = function(func) callback = func end
                 if flag then Library.Flags[flag] = API end
                 return API
             end
@@ -1968,7 +1942,6 @@ function Library:CreateWindow(options)
                 API.OnClicked = function(func) callback = func end
                 return API
             end
-
 
             function SecObj:CreateClipboard(configOrLabel, copyText)
                 local config = type(configOrLabel) == "table" and configOrLabel or {Name = configOrLabel, Text = copyText}
@@ -2012,63 +1985,14 @@ function Library:CreateWindow(options)
                     local newTxt = (arg1 == API) and arg2 or arg1
                     textToCopy = tostring(newTxt)
                 end
-                return API
-            end
-
-            
-            function SecObj:CreateDivider(configOrTitle)
-                local title = type(configOrTitle) == "table" and configOrTitle.Title or configOrTitle
-                
-                local DividerFrame = Create("Frame", {
-                    BackgroundTransparency = 1,
-                    Size = UDim2.new(1, 0, 0, title and 24 or 16),
-                    Parent = SectionContainer
-                })
-                
-                if title and title ~= "" then
-                    local LeftLine = Create("Frame", {
-                        BackgroundColor3 = Theme.Border,
-                        BorderSizePixel = 0,
-                        Position = UDim2.new(0, 5, 0.5, 0),
-                        Size = UDim2.new(0.5, -45, 0, 1),
-                        Parent = DividerFrame
-                    })
-                    
-                    local TitleLbl = Create("TextLabel", {
-                        BackgroundTransparency = 1,
-                        Position = UDim2.new(0, 0, 0, 0),
-                        Size = UDim2.new(1, 0, 1, 0),
-                        Font = Enum.Font.Ubuntu,
-                        Text = title,
-                        TextColor3 = Theme.TextSecondary,
-                        TextSize = 12,
-                        TextXAlignment = Enum.TextXAlignment.Center,
-                        Parent = DividerFrame
-                    })
-                    
-                    local RightLine = Create("Frame", {
-                        BackgroundColor3 = Theme.Border,
-                        BorderSizePixel = 0,
-                        AnchorPoint = Vector2.new(1, 0.5),
-                        Position = UDim2.new(1, -5, 0.5, 0),
-                        Size = UDim2.new(0.5, -45, 0, 1),
-                        Parent = DividerFrame
-                    })
-                else
-                    Create("Frame", {
-                        BackgroundColor3 = Theme.Border,
-                        BorderSizePixel = 0,
-                        Position = UDim2.new(0, 5, 0.5, 0),
-                        Size = UDim2.new(1, -10, 0, 1),
-                        Parent = DividerFrame
-                    })
+                API.SetVisible = function(state) Btn.Visible = state end
+                API.SetDisabled = function(state) 
+                    Btn.Active = not state 
+                    Btn.TextTransparency = state and 0.5 or 0
                 end
-                
-                local API = {}
-                API.SetVisible = function(state) DividerFrame.Visible = state end
-                if type(configOrTitle) == "table" and configOrTitle.Visible == false then
-                    API.SetVisible(false)
-                end
+                API.SetTitle = function(title) Btn.Text = title end
+                API.SetDescription = function(desc) AddTooltip(Btn, desc) end
+                API.OnClicked = function(func) callback = func end
                 return API
             end
 
@@ -2092,6 +2016,8 @@ function Library:CreateWindow(options)
                     Lbl.Text = tostring(newTxt)
                 end
                 API.GetValue = function() return Lbl.Text end
+                API.SetVisible = function(state) Lbl.Visible = state end
+                API.SetTitle = function(title) Lbl.Text = title end
                 return API
             end
 
@@ -2141,7 +2067,6 @@ function Library:CreateWindow(options)
     function WindowObj:ToggleUI()
         UI_Visible = not UI_Visible
         if blurEffect then blurEffect.Enabled = UI_Visible end
-        
         if UI_Visible then
             Main.Visible = true
             Tween(Main, {GroupTransparency = 0, Size = UDim2.new(0, 800, 0, 550)}, 0.4, Enum.EasingStyle.Quart, Enum.EasingDirection.Out)
@@ -2199,6 +2124,14 @@ function Library:CreateWindow(options)
             firstUserTabCreated = true
         end
         return tab
+    end
+
+    function WindowObj:SaveConfig(folder, file)
+        Library:SaveConfig(folder, file)
+    end
+    
+    function WindowObj:LoadConfig(folder, file)
+        Library:LoadConfig(folder, file)
     end
 
     return WindowObj
