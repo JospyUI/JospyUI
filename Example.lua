@@ -135,5 +135,4 @@ ConfigSection:CreateButton("Load Config", function()
     print("Config loaded!")
 end)
 
--- Finally, switch to the first tab when the UI loads.
-Window:SelectTab("Combat")
+-- The first tab is selected automatically.
