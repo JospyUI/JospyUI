@@ -688,7 +688,7 @@ function Library:CreateWindow(options)
                     if not text then return end
                     local InfoIcon = Create("Frame", {
                         BackgroundColor3 = Theme.HeaderButtonBackground,
-                        Position = UDim2.new(1, -25, 0.5, -9),
+                        Position = UDim2.new(1, -18, 0.5, -9),
                         Size = UDim2.new(0, 18, 0, 18),
                         Parent = parent,
                         ZIndex = parent.ZIndex + 1
