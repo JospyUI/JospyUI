@@ -144,6 +144,19 @@ ActionSection:CreateButton("Set Walkspeed to 100", function()
     speedSlider.SetValue(100) 
 end)
 
+ActionSection:CreateKeybind({
+    Name = "Press X to Set WalkSpeed to 200",
+    Default = Enum.KeyCode.X,
+    Tooltip = "Press X on your keyboard to magically change the slider's value to 200!",
+    Flag = "WalkSpeedTrigger",
+    Callback = function(state)
+        if state then
+            speedSlider.SetValue(200)
+            print("Walkspeed forced to 200 via Keybind!")
+        end
+    end
+})
+
 ActionSection:CreateButton("Enable Aimbot & ESP Filters", function()
     -- SetValue() - Changes value from code
     aimbotToggle.SetValue(true)
