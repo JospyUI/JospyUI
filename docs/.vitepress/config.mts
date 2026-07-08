@@ -27,7 +27,7 @@ export default defineConfig({
     ],
 
     socialLinks: [
-      { icon: 'github', link: 'https://github.com/ijosephyusufk-dev/JospyUI' }
+      { icon: 'github', link: 'https://github.com/JospyUI/JospyUI' }
     ],
 
     search: {

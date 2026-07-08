@@ -13,7 +13,7 @@
 
 ## 🚀 Booting the Library
 ```lua
-local K_UI = loadstring(game:HttpGet("https://raw.githubusercontent.com/ijosephyusufk-dev/JospyUI/master/K-UI.lua"))()
+local K_UI = loadstring(game:HttpGet("https://raw.githubusercontent.com/JospyUI/JospyUI/master/K-UI.lua"))()
 ```
 
 ## 🪟 Creating a Window

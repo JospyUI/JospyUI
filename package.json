@@ -8,16 +8,16 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ijosephyusufk-dev/JospyUI.git"
+    "url": "git+https://github.com/JospyUI/JospyUI.git"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "type": "commonjs",
   "bugs": {
-    "url": "https://github.com/ijosephyusufk-dev/JospyUI/issues"
+    "url": "https://github.com/JospyUI/JospyUI/issues"
   },
-  "homepage": "https://github.com/ijosephyusufk-dev/JospyUI#readme",
+  "homepage": "https://github.com/JospyUI/JospyUI#readme",
   "devDependencies": {
     "vitepress": "^1.6.4"
   }

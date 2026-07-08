@@ -6,7 +6,7 @@ hero:
   text: "Premium Roblox UI Library"
   tagline: Modern, sleek, and highly customizable UI framework for your exploit scripts.
   image:
-    src: https://raw.githubusercontent.com/ijosephyusufk-dev/JospyUI/master/docs/logo.png
+    src: https://raw.githubusercontent.com/JospyUI/JospyUI/master/docs/logo.png
     alt: JospyUI
   actions:
     - theme: brand
@@ -14,7 +14,7 @@ hero:
       link: /guide/getting-started
     - theme: alt
       text: View on GitHub
-      link: https://github.com/ijosephyusufk-dev/JospyUI
+      link: https://github.com/JospyUI/JospyUI
 
 features:
   - title: Modern Design

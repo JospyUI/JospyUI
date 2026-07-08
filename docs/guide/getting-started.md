@@ -7,7 +7,7 @@ Welcome to **Jospy UI**, a premium library designed to give your Roblox exploits
 To load Jospy UI into your script, use the following `loadstring`. Make sure to store the result in a variable so you can use its functions!
 
 ```lua
-local K_UI = loadstring(game:HttpGet("https://raw.githubusercontent.com/ijosephyusufk-dev/JospyUI/master/K-UI.lua"))()
+local K_UI = loadstring(game:HttpGet("https://raw.githubusercontent.com/JospyUI/JospyUI/master/K-UI.lua"))()
 ```
 
 ## Creating a Window
