@@ -756,6 +756,13 @@ function Library:CreateWindow(options)
                 API.Refresh = function(arg1, arg2, arg3)
                     local newOpts = (arg1 == API) and arg2 or arg1
                     local newDefault = (arg1 == API) and arg3 or arg2
+                    
+                    -- Safeguard: If they passed the UI component itself as the options table
+                    if type(newOpts) == "table" and newOpts.Refresh then
+                        newOpts = newDefault
+                        newDefault = nil
+                    end
+                    
                     if type(newOpts) ~= "table" then return end
                     options = newOpts
                     selected = newDefault or newOpts[1] or "None"
@@ -935,6 +942,13 @@ function Library:CreateWindow(options)
                 API.Refresh = function(arg1, arg2, arg3)
                     local newOpts = (arg1 == API) and arg2 or arg1
                     local newDefaultArray = (arg1 == API) and arg3 or arg2
+                    
+                    -- Safeguard: If they passed the UI component itself as the options table
+                    if type(newOpts) == "table" and newOpts.Refresh then
+                        newOpts = newDefaultArray
+                        newDefaultArray = nil
+                    end
+                    
                     if type(newOpts) ~= "table" then return end
                     options = newOpts
                     selectedDict = {}
