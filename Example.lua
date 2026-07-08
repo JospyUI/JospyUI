@@ -106,8 +106,11 @@ MiscSection:CreateKeybind({
     Default = Enum.KeyCode.E,
     Tooltip = "Hold this key to automatically shoot when aiming at an enemy.",
     Flag = "TriggerKey",
-    Callback = function(key)
+    OnBind = function(key)
         print("Triggerbot Key set to:", key.Name)
+    end,
+    Callback = function(state)
+        print("Triggerbot Active:", state)
     end
 })
 
