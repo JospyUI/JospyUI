@@ -1058,7 +1058,7 @@ function Library:CreateWindow(options)
                 API.SetValue = function(val) API.Set(val) end
                 API.SetVisible = function(state) DropContainer.Visible = state end
                 API.SetDisabled = function(state) 
-                    ValBtn.Interactable = not state 
+                    pcall(function() ValBtn.Interactable = not state end) 
                     DropLbl.TextTransparency = state and 0.5 or 0
                 end
                 API.SetTitle = function(title) DropLbl.Text = title end
@@ -1318,7 +1318,7 @@ function Library:CreateWindow(options)
                 API.SetValue = function(val) API.Set(val) end
                 API.SetVisible = function(state) DropContainer.Visible = state end
                 API.SetDisabled = function(state) 
-                    ValBtn.Interactable = not state 
+                    pcall(function() ValBtn.Interactable = not state end) 
                     DropLbl.TextTransparency = state and 0.5 or 0
                 end
                 API.SetTitle = function(title) DropLbl.Text = title end
@@ -1395,7 +1395,9 @@ function Library:CreateWindow(options)
                 Fill.Parent = Track
 
                 local dragging = false
+                local isDisabled = false
                 local function updateSlider(input)
+                    if isDisabled then return end
                     local percent = math.clamp((input.Position.X - Track.AbsolutePosition.X) / Track.AbsoluteSize.X, 0, 1)
                     local newValue = math.floor(min + (max - min) * percent)
                     if value ~= newValue then
@@ -1407,6 +1409,7 @@ function Library:CreateWindow(options)
                 end
 
                 Track.InputBegan:Connect(function(input)
+                    if isDisabled then return end
                     if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
                         dragging = true
                         updateSlider(input)
@@ -1437,7 +1440,8 @@ function Library:CreateWindow(options)
                 API.SetValue = function(val) API.Set(val) end
                 API.SetVisible = function(state) SliderContainer.Visible = state end
                 API.SetDisabled = function(state) 
-                    SliderContainer.Interactable = not state 
+                    isDisabled = state
+                    pcall(function() pcall(function() SliderContainer.Interactable = not state end) end)
                     TitleLabel.TextTransparency = state and 0.5 or 0
                 end
                 API.SetTitle = function(title) TitleLabel.Text = title end
@@ -1643,7 +1647,7 @@ function Library:CreateWindow(options)
                 API.SetValue = function(val) API.Set(val) end
                 API.SetVisible = function(state) BindContainer.Visible = state end
                 API.SetDisabled = function(state) 
-                    BindBtn.Interactable = not state 
+                    pcall(function() BindBtn.Interactable = not state end) 
                     KeyTitleLbl.TextTransparency = state and 0.5 or 0
                 end
                 API.SetTitle = function(title) KeyTitleLbl.Text = title end
@@ -1927,7 +1931,7 @@ function Library:CreateWindow(options)
                 API.SetValue = function(val) API.Set(val) end
                 API.SetVisible = function(state) CPContainer.Visible = state end
                 API.SetDisabled = function(state) 
-                    ColorDisplayBtn.Interactable = not state 
+                    pcall(function() ColorDisplayBtn.Interactable = not state end) 
                     ColorLbl.TextTransparency = state and 0.5 or 0
                 end
                 API.SetTitle = function(title) ColorLbl.Text = title end
@@ -2017,7 +2021,7 @@ function Library:CreateWindow(options)
                 API.SetVisible = function(state) TogBtn.Visible = state end
                 API.SetDisabled = function(state)
                     isDisabled = state
-                    pcall(function() TogBtn.Interactable = not state end)
+                    pcall(function() pcall(function() TogBtn.Interactable = not state end) end)
                     TogBtn.AutoButtonColor = not state
                     TogLbl.TextTransparency = state and 0.5 or 0
                 end
@@ -2056,7 +2060,7 @@ function Library:CreateWindow(options)
                 API.SetVisible = function(state) Btn.Visible = state end
                 API.SetDisabled = function(state) 
                     isDisabled = state
-                    pcall(function() Btn.Interactable = not state end)
+                    pcall(function() pcall(function() Btn.Interactable = not state end) end)
                     Btn.TextTransparency = state and 0.5 or 0
                 end
                 API.SetTitle = function(title) Btn.Text = title end
@@ -2109,7 +2113,7 @@ function Library:CreateWindow(options)
                 end
                 API.SetVisible = function(state) Btn.Visible = state end
                 API.SetDisabled = function(state) 
-                    Btn.Interactable = not state 
+                    pcall(function() Btn.Interactable = not state end) 
                     Btn.TextTransparency = state and 0.5 or 0
                 end
                 API.SetTitle = function(title) Btn.Text = title end

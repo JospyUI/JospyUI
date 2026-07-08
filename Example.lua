@@ -176,6 +176,39 @@ ControlSection:CreateButton("3. Toggle'ı TAMAMEN KALDIR / GERİ GETİR (Görün
     end
 end)
 
+local SliderControlSection = DisableTab:CreateSection("Slider'ı Yönetme (WalkSpeed Slider'ı)")
+SliderControlSection:CreateLabel("Aşağıdaki butonlar 'All Modules' sekmesindeki WalkSpeed Slider'ını kontrol eder.")
+
+-- 1. Slider'ın değerini kodla değiştirmek
+SliderControlSection:CreateButton("1. Slider'ı 100 Yap", function()
+    speedSlider.SetValue(100) 
+    K_UI:Notify("Başarılı", "WalkSpeed Slider değeri 100 yapıldı!", 3)
+end)
+
+-- 2. Slider'ı devre dışı bırakmak
+local isSliderDisabled = false
+SliderControlSection:CreateButton("2. Slider'ı DEVRE DIŞI BIRAK / AÇ (Sürüklenemez Yap)", function()
+    isSliderDisabled = not isSliderDisabled
+    speedSlider.SetDisabled(isSliderDisabled) 
+    if isSliderDisabled then
+        K_UI:Notify("Kilitlendi", "Artık WalkSpeed Slider'ı SÜRÜKLENEMEZ!", 3)
+    else
+        K_UI:Notify("Açıldı", "Artık WalkSpeed Slider'ı Kullanılabilir!", 3)
+    end
+end)
+
+-- 3. Slider'ı gizlemek
+local isSliderHidden = false
+SliderControlSection:CreateButton("3. Slider'ı TAMAMEN KALDIR / GERİ GETİR", function()
+    isSliderHidden = not isSliderHidden
+    speedSlider.SetVisible(not isSliderHidden)
+    if isSliderHidden then
+        K_UI:Notify("Kaldırıldı", "WalkSpeed Slider'ı GUI'den tamamen silindi!", 3)
+    else
+        K_UI:Notify("Geri Geldi", "WalkSpeed Slider'ı tekrar görünür oldu!", 3)
+    end
+end)
+
 
 -- ==========================================
 -- TAB 4: ESP EXAMPLE (Live Player Updates)
